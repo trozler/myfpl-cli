@@ -1,6 +1,6 @@
 import requests, traceback, re, getpass
 
-#Hardcode password and login (login is equivelent to email) fields for future 
+#Hardcode login (login is equivelent to email) field for future . Never hardcode password.
 credentials = {'password':None,
                'login':None,
                'redirect_uri': 'https://fantasy.premierleague.com/a/login',
@@ -11,7 +11,7 @@ credentials = {'password':None,
 team_id = None
 
 #Only ask for validation if team_id, email and password havn't been set
-if team_id == None or credentials['password'] == None or credentials['password'] == None:
+if team_id == None or credentials['password'] == None or credentials['login'] == None:
     while True:
         print ("Enter team ID: ", end = '')
         team_id = input()
@@ -31,7 +31,6 @@ if team_id == None or credentials['password'] == None or credentials['password']
         credentials['login'] = email
         print ("Password: ", end = '')
         credentials['password'] = getpass.getpass()
-
         break
 
 #Bootstrap API
