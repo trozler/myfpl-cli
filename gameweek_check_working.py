@@ -1,17 +1,16 @@
 import requests, traceback, re, getpass
 
-#Hardcode login (login is equivelent to email) field for future . Never hardcode password.
+#Hardcode team-id login (login is equivelent to email) field for future . Never hardcode password.
 credentials = {'password':None,
-               'login':None,
+               'login': None,
                'redirect_uri': 'https://fantasy.premierleague.com/a/login',
                'app': 'plfpl-web'
                }
 
-#Set team_id for future use by changing None
 team_id = None
 
 #Only ask for validation if team_id, email and password havn't been set
-if team_id == None or credentials['password'] == None or credentials['login'] == None:
+if team_id == None or credentials['login'] == None:
     while True:
         print ("Enter team ID: ", end = '')
         team_id = input()
@@ -27,11 +26,16 @@ if team_id == None or credentials['password'] == None or credentials['login'] ==
         if match == None:
             print('Bad email please re-enter')
             continue
-
         credentials['login'] = email
+
         print ("Password: ", end = '')
         credentials['password'] = getpass.getpass()
         break
+
+#getpass method stops password echoing in terminal, menaing it remains hidden. 
+else:
+    print ("Password: ", end = '')
+    credentials['password'] = getpass.getpass()
 
 #Bootstrap API
 bootstrap_url = 'https://fantasy.premierleague.com/api/bootstrap-static/'
