@@ -1,4 +1,4 @@
-import requests, traceback, re
+import requests, traceback, re, getpass
 
 #Hardcode password and login (login is equivelent to email) fields for future 
 credentials = {'password':None,
@@ -30,8 +30,7 @@ if team_id == None or credentials['password'] == None or credentials['password']
 
         credentials['login'] = email
         print ("Password: ", end = '')
-        password = input()
-        credentials['password'] = password
+        credentials['password'] = getpass.getpass()
 
         break
 
