@@ -1,13 +1,13 @@
 import requests, traceback, re, getpass
 
 #Hardcode team-id login (login is equivelent to email) field for future . Never hardcode password.
-credentials = {'password':None,
-               'login': None,
+credentials = {'password': None,
+               'login': 'tony.rosler246@gmail.com',
                'redirect_uri': 'https://fantasy.premierleague.com/a/login',
                'app': 'plfpl-web'
                }
 
-team_id = None
+team_id = 663372
 
 #Only ask for validation if team_id, email and password havn't been set
 if team_id == None or credentials['login'] == None:
@@ -60,6 +60,7 @@ get_transfer = session.get(transfer_api).json()
 team = []
 status = []
 sp = ' '
+speed_gw_points = 0
 
 def get_player_info(transfers:bool):
     
@@ -93,9 +94,9 @@ def get_player_info(transfers:bool):
     print ("\n" + sp*36 + "Points" + sp*11 + "+/-" + sp*4 + "Chance")
     print ("Name" + sp*32 + "(GW)" + sp*5 + "Price" + sp*3 + "(GW)" + sp*3 + "NextGW" + sp*3 + "News\n")
 
-    for i in range(len(team)):
-        id = team[i]
-        player_status = status[i]
+    for pl in range(len(team)):
+        id = team[pl]
+        player_status = status[pl]
         for i in range(len(get_data_bootstrap['elements'])):
             if get_data_bootstrap['elements'][i]['id'] == id:
                 name = get_data_bootstrap['elements'][i]['web_name']
@@ -104,6 +105,11 @@ def get_player_info(transfers:bool):
                     gw_points *= 2
                 elif player_status == "(TC)":
                     gw_points *= 3
+
+                if pl < 12:
+                    global speed_gw_points
+                    speed_gw_points += gw_points
+
                 price = get_data_bootstrap['elements'][i]['now_cost'] / 10
                 price_change = get_data_bootstrap['elements'][i]['cost_change_event'] / 10
                 next_round = get_data_bootstrap['elements'][i]['chance_of_playing_next_round']
@@ -119,9 +125,11 @@ if (len(get_transfer) == 0):
     get_player_info(False)
 else:
     get_player_info(True)
+    
 
-print ("\n\nGameweek points: %-7d\tOverall points: %-7d" %
-    (get_data_entry["summary_event_points"], get_data_entry["summary_overall_points"]))
+print ("\n\nGameweek points: %d (%d)       \tOverall points: %-7d" %
+    (speed_gw_points, len(get_transfer) * 4 - 4,
+         get_data_entry["summary_overall_points"]))
 
 print ("Gameweek rank:   %-7s\tOverall rank:   %-7s\n" %
     (get_data_entry["summary_event_rank"], get_data_entry["summary_overall_rank"]))
