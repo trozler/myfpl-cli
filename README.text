@@ -1,9 +1,15 @@
-## Fantasy Premier League CLI team checker
-A python script designed for command line. Allows fpl users to skip the laborious web log in flow in a single command. Script will correctly displays rank, TC, bench boost and transfer minus points.
+## Fantasy Premier League CLI gameweek and team checker
+Two python scripts designed for command line that allow fpl users to retrieve information about their teams whilst skipping the laborious web log in flow in a single command.
+
+*gw script will correctly displays points, price changes, leagues, rank, TC, bench boost and transfer minus points.
+*team script will correctly display the team you have selected for next gameweek, including subs and transfers and more.
 
 
-#Run this command in terminal to create an alias which allows you to invoke script through "fpl"
-echo 'alias fpl="python ~/Desktop/gameweek_check_personal.py"' >> ~/.bash_profile
+#Run these commands in terminal to create an alias which allows you to invoke gameweek and team scripts. 
+#Note this assumes files are stored in your desktop, please change accordingly. 
+
+echo 'alias fplgw="python ~/Desktop/gameweek_checker.py"' >> ~/.bash_profile
+echo 'alias fplteam="python ~/Desktop/eam_checker.py"' >> ~/.bash_profile
 
 
 NOTE/
@@ -12,7 +18,7 @@ Example: https://fantasy.premierleague.com/entry/663372/history
 
 
 
-SAMPLE OUTPUT/
+SAMPLE OUTPUT - Gameweek checker/
 
                                     Points           +/-    Chance
 Name                                (GW)     Price   (GW)   NextGW   News
@@ -58,3 +64,30 @@ Overall                                 478097     1232080    -753983     275 (1
 @OfficialFPL on Twitter                 8606       19183      -10577      256 (87)
 Rob Hughes Got Banged                   15         21         -6          252 (83)
 @FPLEditor's Charity League             2281       4569       -2288       264 (95)
+
+
+
+
+SAMPLE OUTPUT - Team checker/
+
+
+                                            +/-    Chance
+Name                                Price   (GW)   NextGW   News
+
+Patrício                            5.0     0.0    100      
+Robertson                           7.0     0.0    100      
+van Dijk                            6.5     0.0    100      
+Zinchenko                           5.5     0.0    100      
+Wan-Bissaka                         5.6     0.0    100      
+Sterling                  (C)       12.2    0.0    100      
+De Bruyne                           9.7     0.1    100      
+Mount                               6.2     0.1    75       Calf injury - 75% chance of playing
+Mané                      (VC)      11.5    0.0    100      
+Pukki                               6.9     0.1    100      
+Barnes                              6.6     0.0    100      
+Button                    (Bench)   4.0     0.0    100      
+Cantwell                  (Bench)   4.7     0.1    100      
+Kelly                     (Bench)   4.1     0.1    100      
+Greenwood                 (Bench)   4.5     0.0    100      
+
+

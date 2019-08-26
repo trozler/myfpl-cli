@@ -2,12 +2,12 @@ import requests, traceback, re, getpass
 
 #Hardcode team-id login (login is equivelent to email) field for future . Never hardcode password.
 credentials = {'password': None,
-               'login': None,
+               'login': 'tony.rosler246@gmail.com',
                'redirect_uri': 'https://fantasy.premierleague.com/a/login',
                'app': 'plfpl-web'
                }
 
-team_id = None
+team_id = 663372
 
 #Only ask for validation if team_id, email and password havn't been set
 if team_id == None or credentials['login'] == None:
