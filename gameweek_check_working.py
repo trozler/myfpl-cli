@@ -2,12 +2,12 @@ import requests, traceback, re, getpass
 
 #Hardcode team-id login (login is equivelent to email) field for future . Never hardcode password.
 credentials = {'password': None,
-               'login': 'tony.rosler246@gmail.com',
+               'login': None,
                'redirect_uri': 'https://fantasy.premierleague.com/a/login',
                'app': 'plfpl-web'
                }
 
-team_id = 663372
+team_id = None
 
 #Only ask for validation if team_id, email and password havn't been set
 if team_id == None or credentials['login'] == None:
@@ -32,7 +32,7 @@ if team_id == None or credentials['login'] == None:
         credentials['password'] = getpass.getpass()
         break
 
-#getpass method stops password echoing in terminal, menaing it remains hidden. 
+#getpass method stops password echoing in terminal.
 else:
     print ("Password: ", end = '')
     credentials['password'] = getpass.getpass()
@@ -45,94 +45,68 @@ get_data_bootstrap = requests.get(bootstrap_url).json()
 session = requests.session()
 session.post('https://users.premierleague.com/accounts/login/', data=credentials)
 
-#Team API
-team_api = 'https://fantasy.premierleague.com/api/my-team/%s/' % (team_id)
-get_data_team = session.get(team_api).json()
-
-#Rank section
+#Entry section
 entry_api = 'https://fantasy.premierleague.com/api/entry/%s/' % team_id
 get_data_entry = session.get(entry_api).json()
 
-#Transfer API
-transfer_api = 'https://fantasy.premierleague.com/api/entry/%s/transfers-latest/' % (team_id)
-get_transfer = session.get(transfer_api).json()
+#gw_Team API
+gw_team_api = 'https://fantasy.premierleague.com/api/entry/%s/event/%s/picks/' % (team_id, get_data_entry["current_event"])
+get_gw_team = session.get(gw_team_api).json()
 
 team = []
 status = []
 sp = ' '
-speed_gw_points = 0
 
-def get_player_info(transfers:bool):
-    
-    for i in range(len(get_data_team['picks'])):
-        player_id = get_data_team['picks'][i]['element']
-        multiplier = get_data_team['picks'][i]['multiplier']
-        vice_captain = get_data_team['picks'][i]['is_vice_captain']
-        position = get_data_team['picks'][i]['position']
+for i in range(len(get_gw_team['picks'])):
+    player_id = get_gw_team['picks'][i]['element']
+    multiplier = get_gw_team['picks'][i]['multiplier']
+    vice_captain = get_gw_team['picks'][i]['is_vice_captain']
+    position = get_gw_team['picks'][i]['position']
 
-        if multiplier == 2:
-            player_status = "(C)"
-        elif multiplier == 3:
-            player_status = "(TC)"
-        elif vice_captain == True:
-            player_status = "(VC)"
-        elif position > 11:
-            player_status = "(Bench)"
-        else:
-            player_status = ""
+    if multiplier == 2:
+        player_status = "(C)"
+    elif multiplier == 3:
+        player_status = "(TC)"
+    elif vice_captain == True:
+        player_status = "(VC)"
+    elif multiplier == 0:
+        player_status = "(Bench)"
+    else:
+        player_status = ""
 
-        team.append(player_id)
-        status.append(player_status)
+    team.append(player_id)
+    status.append(player_status)
 
-    if transfers:
-        #replace transferd in players with transferd out
-        for i in range(len(get_transfer)):
-            player_out = get_transfer[i]['element_out']
-            player_in = get_transfer[i]['element_in']
-            team[team.index(player_in)] = player_out
-        
-    print ("\n" + sp*36 + "Points" + sp*11 + "+/-" + sp*4 + "Chance")
-    print ("Name" + sp*32 + "(GW)" + sp*5 + "Price" + sp*3 + "(GW)" + sp*3 + "NextGW" + sp*3 + "News\n")
+print ("\n" + sp*36 + "Points" + sp*11 + "+/-" + sp*4 + "Chance")
+print ("Name" + sp*32 + "(GW)" + sp*5 + "Price" + sp*3 + "(GW)" + sp*3 + "NextGW" + sp*3 + "News\n")
 
-    for pl in range(len(team)):
-        id = team[pl]
-        player_status = status[pl]
-        for i in range(len(get_data_bootstrap['elements'])):
-            if get_data_bootstrap['elements'][i]['id'] == id:
-                name = get_data_bootstrap['elements'][i]['web_name']
-                gw_points = get_data_bootstrap['elements'][i]['event_points']
-                if player_status == "(C)":
-                    gw_points *= 2
-                elif player_status == "(TC)":
-                    gw_points *= 3
+for pl in range(len(team)):
+    id = team[pl]
+    player_status = status[pl]
+    for i in range(len(get_data_bootstrap['elements'])):
+        if get_data_bootstrap['elements'][i]['id'] == id:
+            name = get_data_bootstrap['elements'][i]['web_name']
+            gw_points = get_data_bootstrap['elements'][i]['event_points']
+            if player_status == "(C)":
+                gw_points *= 2
+            elif player_status == "(TC)":
+                gw_points *= 3
+            price = get_data_bootstrap['elements'][i]['now_cost'] / 10
+            price_change = get_data_bootstrap['elements'][i]['cost_change_event'] / 10
+            next_round = get_data_bootstrap['elements'][i]['chance_of_playing_next_round']
+            if next_round == None:
+                next_round = 100
+            news = get_data_bootstrap['elements'][i]['news']
 
-                if pl < 12:
-                    global speed_gw_points
-                    speed_gw_points += gw_points
-
-                price = get_data_bootstrap['elements'][i]['now_cost'] / 10
-                price_change = get_data_bootstrap['elements'][i]['cost_change_event'] / 10
-                next_round = get_data_bootstrap['elements'][i]['chance_of_playing_next_round']
-                if next_round == None:
-                    next_round = 100
-                news = get_data_bootstrap['elements'][i]['news']
-
-                print("%-25s %-9s %-8d %-7.1f %-6.1f %-8d %s" %
-                    (name, player_status, gw_points, price, price_change, next_round, news))
-
-#If length is equal to 0 then no transfers we just enter regular flow
-if (len(get_transfer) == 0):
-    get_player_info(False)
-else:
-    get_player_info(True)
-    
+            print("%-25s %-9s %-8d %-7.1f %-6.1f %-8d %s" %
+                (name, player_status, gw_points, price, price_change, next_round, news))
 
 print ("\n\nGameweek points: %d (%d)       \tOverall points: %-7d" %
-    (speed_gw_points, len(get_transfer) * 4 - 4,
-         get_data_entry["summary_overall_points"]))
+    (get_gw_team["entry_history"]['points'], get_gw_team["entry_history"]['event_transfers'] * 4 - 4, 
+        get_gw_team["entry_history"]["total_points"]))
 
 print ("Gameweek rank:   %-7s\tOverall rank:   %-7s\n" %
-    (get_data_entry["summary_event_rank"], get_data_entry["summary_overall_rank"]))
+    (get_gw_team["entry_history"]["rank"], get_gw_team["entry_history"]["overall_rank"]))
 
 print ("\nH2H Leagues:\n")
 print (sp*40 + "Prev" + sp*7 + "Curr" + sp*7 + "Rank" + sp*8 + "Leader")

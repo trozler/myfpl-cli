@@ -1,10 +1,9 @@
 ## Fantasy Premier League CLI team checker
-A python script designed for command line. Allows fpl users to skip the laborious web log in flow in a single command. 
+A python script designed for command line. Allows fpl users to skip the laborious web log in flow in a single command. Script will correctly displays rank, TC, bench boost and transfer minus points.
 
 
 #Run this command in terminal to create an alias which allows you to invoke script through "fpl"
 echo 'alias fpl="python ~/Desktop/gameweek_check_personal.py"' >> ~/.bash_profile
-
 
 
 NOTE/
