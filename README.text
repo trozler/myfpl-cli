@@ -5,16 +5,16 @@ Two python scripts designed for command line that allow fpl users to retrieve in
 *team script will correctly display the team you have selected for next gameweek, including subs and transfers and more.
 
 
-#Run these commands in terminal to create an alias which allows you to invoke gameweek and team scripts. 
-#Note this assumes files are stored in your desktop, please change accordingly. 
+#Run these commands in terminal to create an alias that allows you to invoke gameweek and team scripts. 
+#Note this assumes files are stored in your desktop, please change path accordingly. 
 
 echo 'alias fplgw="python ~/Desktop/gameweek_checker.py"' >> ~/.bash_profile
-echo 'alias fplteam="python ~/Desktop/eam_checker.py"' >> ~/.bash_profile
+echo 'alias fplteam="python ~/Desktop/team_checker.py"' >> ~/.bash_profile
 
 
 NOTE/
 Users are required to know their **unique fpl entry id**. The id can be retreived on the fpl site by clicking "my team", "view gameweek history" and looking at url.
-Example: https://fantasy.premierleague.com/entry/663372/history
+Example: https://fantasy.premierleague.com/entry/{team-id}/history
 
 
 
