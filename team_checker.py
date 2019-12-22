@@ -1,13 +1,15 @@
 import requests, traceback, re, getpass
 
+#Team checker is intended of users to check their team selection for future gameweeks. 
+
 #Hardcode team-id login (login is equivelent to email) field for future. Never hardcode password.
 credentials = {'password':None,
-               'login': None,
+               'login': 'tony.rosler246@gmail.com',
                'redirect_uri': 'https://fantasy.premierleague.com/a/login',
                'app': 'plfpl-web'
                }
 
-team_id = None
+team_id = 663372
 
 #Only ask for validation if team_id, email and password havn't been set
 if team_id == None or credentials['login'] == None:
@@ -92,6 +94,20 @@ for i in range(len(team)):
 
             print("%-25s %-9s %-7.1f %-6.1f %-8d %s" %
                 (name, player_status, price, price_change, next_round, news))
+
+
+print ("\nFree transfers: %d" % (get_data_team['transfers']["limit"]))
+print("Transfers used: %d" %  get_data_team['transfers']["made"])
+print ("Team value: £%.1fM" % (get_data_team['transfers']["value"] / 10))
+print ("Money in da bank: £%.1fM" % (get_data_team['transfers']["bank"] / 10))
+
+print("\nWildcard: %s" % ("Yes" if len(get_data_team["chips"][0]["played_by_entry"]) == 0 else "No - refill after GW 20"))
+
+print("Free hit: %s" % ("Yes" if len(get_data_team["chips"][1]["played_by_entry"]) == 0 else "No"))
+
+print("Bench boost: %s" % ("Yes" if len(get_data_team["chips"][2]["played_by_entry"]) == 0 else "No"))
+
+print("Triple captain: %s" % ("Yes" if len(get_data_team["chips"][2]["played_by_entry"]) == 0 else "No"))
 
 print()
 

@@ -6,6 +6,8 @@ import requests, traceback, re, getpass
 - Use pre computer points. Have to compute his team, using speedy points .
 - Ideal, use a hash set comparisom to find differneced (use factory method have each team stored in a set). Output differnece in players with their current gw points (real time). 
 
+2. Update readme to reflect new features. 
+
 
 '''
 
@@ -117,8 +119,14 @@ for pl in range(len(team)):
             print("%-25s %-9s %-8d %-7.1f %-6.1f %-8d %s" %
                 (name, player_status, gw_points, price, price_change, next_round, news))
 
+#TODO
+#I'm displaying the worng transfer infromation. -4 is from transfer made this gameweek. Not lasrt gameweek. 
+#The gameweek page is all about, what is happening in your current ganeweek page. 
+
+#If we are before deadline use current method. If after deadline, put last weeks 
+
 print ("\n\nGameweek points: %d (%d)       \tOverall points: %-7d" %
-    (speed_gw_points, get_gw_team["entry_history"]['event_transfers'] * 4 - 4, 
+    (speed_gw_points, get_gw_team["entry_history"]["event_transfers_cost"], 
         get_gw_team["entry_history"]["total_points"]))
 
 print ("Gameweek rank:   %-7s\tOverall rank:   %-7s\n" %
