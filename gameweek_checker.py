@@ -1,13 +1,22 @@
 import requests, traceback, re, getpass
 
+#TODO (development 20th Decemeber)
+'''
+1. Allow users to see their results in head to head real time. 
+- Use pre computer points. Have to compute his team, using speedy points .
+- Ideal, use a hash set comparisom to find differneced (use factory method have each team stored in a set). Output differnece in players with their current gw points (real time). 
+
+
+'''
+
 #Hardcode team-id login (login is equivelent to email) field for future . Never hardcode password.
 credentials = {'password': None,
-               'login': None,
+               'login': 'tony.rosler246@gmail.com',
                'redirect_uri': 'https://fantasy.premierleague.com/a/login',
                'app': 'plfpl-web'
                }
 
-team_id = None
+team_id = 663372
 
 #Only ask for validation if team_id, email and password havn't been set
 if team_id == None or credentials['login'] == None:
@@ -55,7 +64,9 @@ get_gw_team = session.get(gw_team_api).json()
 
 team = []
 status = []
+multiplier_arr = []
 sp = ' '
+speed_gw_points = 0
 
 for i in range(len(get_gw_team['picks'])):
     player_id = get_gw_team['picks'][i]['element']
@@ -76,6 +87,7 @@ for i in range(len(get_gw_team['picks'])):
 
     team.append(player_id)
     status.append(player_status)
+    multiplier_arr.append(multiplier)
 
 print ("\n" + sp*36 + "Points" + sp*11 + "+/-" + sp*4 + "Chance")
 print ("Name" + sp*32 + "(GW)" + sp*5 + "Price" + sp*3 + "(GW)" + sp*3 + "NextGW" + sp*3 + "News\n")
@@ -83,6 +95,7 @@ print ("Name" + sp*32 + "(GW)" + sp*5 + "Price" + sp*3 + "(GW)" + sp*3 + "NextGW
 for pl in range(len(team)):
     id = team[pl]
     player_status = status[pl]
+    multi = multiplier_arr[pl]
     for i in range(len(get_data_bootstrap['elements'])):
         if get_data_bootstrap['elements'][i]['id'] == id:
             name = get_data_bootstrap['elements'][i]['web_name']
@@ -98,11 +111,14 @@ for pl in range(len(team)):
                 next_round = 100
             news = get_data_bootstrap['elements'][i]['news']
 
+            if multi > 0:
+                speed_gw_points += gw_points
+
             print("%-25s %-9s %-8d %-7.1f %-6.1f %-8d %s" %
                 (name, player_status, gw_points, price, price_change, next_round, news))
 
 print ("\n\nGameweek points: %d (%d)       \tOverall points: %-7d" %
-    (get_gw_team["entry_history"]['points'], get_gw_team["entry_history"]['event_transfers'] * 4 - 4, 
+    (speed_gw_points, get_gw_team["entry_history"]['event_transfers'] * 4 - 4, 
         get_gw_team["entry_history"]["total_points"]))
 
 print ("Gameweek rank:   %-7s\tOverall rank:   %-7s\n" %

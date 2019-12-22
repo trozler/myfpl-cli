@@ -1,6 +1,6 @@
 import requests, traceback, re, getpass
 
-#Hardcode team-id login (login is equivelent to email) field for future . Never hardcode password.
+#Hardcode team-id login (login is equivelent to email) field for future. Never hardcode password.
 credentials = {'password':None,
                'login': None,
                'redirect_uri': 'https://fantasy.premierleague.com/a/login',

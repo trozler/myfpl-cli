@@ -1,12 +1,12 @@
 ## Fantasy Premier League CLI gameweek and team checker
 Two python scripts designed for command line that allow fpl users to retrieve information about their teams whilst skipping the laborious web log in flow in a single command.
 
-*gw script will correctly displays points, price changes, leagues, rank, TC, bench boost and transfer minus points.
+*gw script will correctly displays real time points, price changes, leagues, rank, TC, bench boost and transfer minus points.
 *team script will correctly display the team you have selected for next gameweek, including subs and transfers and more.
 
 
-#Run these commands in terminal to create an alias that allows you to invoke gameweek and team scripts. 
-#Note this assumes files are stored in your desktop, please change path accordingly. 
+#For linux, runthe commands below to create an alias in your bash_profile allowing you to easily invoke gameweek(fplgw) and team(fplteam) scripts. 
+
 
 echo 'alias fplgw="python ~/Desktop/gameweek_checker.py"' >> ~/.bash_profile
 echo 'alias fplteam="python ~/Desktop/team_checker.py"' >> ~/.bash_profile
