@@ -4,12 +4,12 @@ import requests, traceback, re, getpass
 
 #Hardcode team-id login (login is equivelent to email) field for future. Never hardcode password.
 credentials = {'password':None,
-               'login': 'tony.rosler246@gmail.com',
+               'login': None,
                'redirect_uri': 'https://fantasy.premierleague.com/a/login',
                'app': 'plfpl-web'
                }
 
-team_id = 663372
+team_id = None
 
 #Only ask for validation if team_id, email and password havn't been set
 if team_id == None or credentials['login'] == None:
@@ -51,15 +51,17 @@ session.post('https://users.premierleague.com/accounts/login/', data=credentials
 team_api = 'https://fantasy.premierleague.com/api/my-team/%s/' % (team_id)
 get_data_team = session.get(team_api).json()
 
-team = []
-status = []
 sp = ' '
 
-for i in range(len(get_data_team['picks'])):
-    player_id = get_data_team['picks'][i]['element']
-    multiplier = get_data_team['picks'][i]['multiplier']
-    vice_captain = get_data_team['picks'][i]['is_vice_captain']
-    position = get_data_team['picks'][i]['position']
+print()   
+print ("\n" + sp*44 + "+/-" + sp*4 + "Purchase" + sp*3 +"Chance")
+print ("Name" + sp*32 + "Price" + sp*3 + "(GW)" + sp*3 + "Price" + sp*6 + "NextGW" + sp*3 + "News\n")
+
+for j in range(len(get_data_team['picks'])):
+    id = get_data_team['picks'][j]['element']
+    multiplier = get_data_team['picks'][j]['multiplier']
+    vice_captain = get_data_team['picks'][j]['is_vice_captain']
+    position = get_data_team['picks'][j]['position']
 
     if multiplier == 2:
         player_status = "(C)"
@@ -72,16 +74,6 @@ for i in range(len(get_data_team['picks'])):
     else:
         player_status = ""
 
-    team.append(player_id)
-    status.append(player_status)
-
-print()   
-print ("\n" + sp*44 + "+/-" + sp*4 + "Chance")
-print ("Name" + sp*32 + "Price" + sp*3 + "(GW)" + sp*3 + "NextGW" + sp*3 + "News\n")
-
-for i in range(len(team)):
-    id = team[i]
-    player_status = status[i]
     for i in range(len(get_data_bootstrap['elements'])):
         if get_data_bootstrap['elements'][i]['id'] == id:
             name = get_data_bootstrap['elements'][i]['web_name']
@@ -92,24 +84,47 @@ for i in range(len(team)):
                 next_round = 100
             news = get_data_bootstrap['elements'][i]['news']
 
-            print("%-25s %-9s %-7.1f %-6.1f %-8d %s" %
-                (name, player_status, price, price_change, next_round, news))
+            print("%-25s %-9s %-7.1f %-6.1f %-10.1f %-8d %s" %
+                (name, player_status, price, price_change, (get_data_team['picks'][j]['purchase_price'] / 10),next_round, news))
 
+            break
 
 print ("\nFree transfers: %d" % (get_data_team['transfers']["limit"]))
 print("Transfers used: %d" %  get_data_team['transfers']["made"])
 print ("Team value: £%.1fM" % (get_data_team['transfers']["value"] / 10))
 print ("Money in da bank: £%.1fM" % (get_data_team['transfers']["bank"] / 10))
 
-print("\nWildcard: %s" % ("Yes" if len(get_data_team["chips"][0]["played_by_entry"]) == 0 else "No - refill after GW 20"))
-
+print("\nWildcard: %s" % ("Yes" if len(get_data_team["chips"][0]["played_by_entry"]) == 0 else "No"))
 print("Free hit: %s" % ("Yes" if len(get_data_team["chips"][1]["played_by_entry"]) == 0 else "No"))
-
 print("Bench boost: %s" % ("Yes" if len(get_data_team["chips"][2]["played_by_entry"]) == 0 else "No"))
-
 print("Triple captain: %s" % ("Yes" if len(get_data_team["chips"][2]["played_by_entry"]) == 0 else "No"))
 
+#Transfers
+#Latest transfers API
+latest_transfer_url = 'https://fantasy.premierleague.com/api/entry/%s/transfers-latest/' % (team_id)
+get_latest_transfer = session.get(latest_transfer_url).json()
+print('\nTransfers:')
+print('Player out' + 21*sp + 'Player in\n')
+
+for j in range(len(get_latest_transfer)):
+    trade = get_latest_transfer[j]
+    flag_in = False
+    flag_out = False
+    name_in = None
+    name_out = None
+    
+    i = 0
+    while flag_out == False or flag_in == False:
+        if flag_in == False and get_data_bootstrap['elements'][i]['id'] == trade["element_in"]:
+            name_in = get_data_bootstrap['elements'][i]['web_name']
+            flag_in = True
+
+        if flag_out == False and get_data_bootstrap['elements'][i]['id'] == trade['element_out']:
+            name_out = get_data_bootstrap['elements'][i]['web_name']
+            flag_out = True
+        
+        i += 1
+    print("%-30s %s" % (name_out, name_in))
+
 print()
-
-
 

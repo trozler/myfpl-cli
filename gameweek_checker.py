@@ -1,24 +1,15 @@
 import requests, traceback, re, getpass
 
-#TODO (development 20th Decemeber)
-'''
-1. Allow users to see their results in head to head real time. 
-- Use pre computer points. Have to compute his team, using speedy points .
-- Ideal, use a hash set comparisom to find differneced (use factory method have each team stored in a set). Output differnece in players with their current gw points (real time). 
-
-2. Update readme to reflect new features. 
-
-
-'''
+#Gameweek checker is intended for users who want to keep updated on their teams during a gameweek. 
 
 #Hardcode team-id login (login is equivelent to email) field for future . Never hardcode password.
 credentials = {'password': None,
-               'login': 'tony.rosler246@gmail.com',
+               'login': None,
                'redirect_uri': 'https://fantasy.premierleague.com/a/login',
                'app': 'plfpl-web'
                }
 
-team_id = 663372
+team_id = None
 
 #Only ask for validation if team_id, email and password havn't been set
 if team_id == None or credentials['login'] == None:
@@ -64,17 +55,17 @@ get_data_entry = session.get(entry_api).json()
 gw_team_api = 'https://fantasy.premierleague.com/api/entry/%s/event/%s/picks/' % (team_id, get_data_entry["current_event"])
 get_gw_team = session.get(gw_team_api).json()
 
-team = []
-status = []
-multiplier_arr = []
 sp = ' '
 speed_gw_points = 0
 
-for i in range(len(get_gw_team['picks'])):
-    player_id = get_gw_team['picks'][i]['element']
-    multiplier = get_gw_team['picks'][i]['multiplier']
-    vice_captain = get_gw_team['picks'][i]['is_vice_captain']
-    position = get_gw_team['picks'][i]['position']
+print ("\n" + sp*36 + "Points" + sp*11 + "+/-" + sp*4 + "Chance")
+print ("Name" + sp*32 + "(GW)" + sp*5 + "Price" + sp*3 + "(GW)" + sp*3 + "NextGW" + sp*3 + "News\n")
+
+for j in range(len(get_gw_team['picks'])):
+    id = get_gw_team['picks'][j]['element']
+    multiplier = get_gw_team['picks'][j]['multiplier']
+    vice_captain = get_gw_team['picks'][j]['is_vice_captain']
+    position = get_gw_team['picks'][j]['position']
 
     if multiplier == 2:
         player_status = "(C)"
@@ -87,24 +78,13 @@ for i in range(len(get_gw_team['picks'])):
     else:
         player_status = ""
 
-    team.append(player_id)
-    status.append(player_status)
-    multiplier_arr.append(multiplier)
-
-print ("\n" + sp*36 + "Points" + sp*11 + "+/-" + sp*4 + "Chance")
-print ("Name" + sp*32 + "(GW)" + sp*5 + "Price" + sp*3 + "(GW)" + sp*3 + "NextGW" + sp*3 + "News\n")
-
-for pl in range(len(team)):
-    id = team[pl]
-    player_status = status[pl]
-    multi = multiplier_arr[pl]
     for i in range(len(get_data_bootstrap['elements'])):
         if get_data_bootstrap['elements'][i]['id'] == id:
             name = get_data_bootstrap['elements'][i]['web_name']
             gw_points = get_data_bootstrap['elements'][i]['event_points']
-            if player_status == "(C)":
+            if multiplier == 2:
                 gw_points *= 2
-            elif player_status == "(TC)":
+            elif multiplier == 3:
                 gw_points *= 3
             price = get_data_bootstrap['elements'][i]['now_cost'] / 10
             price_change = get_data_bootstrap['elements'][i]['cost_change_event'] / 10
@@ -113,17 +93,13 @@ for pl in range(len(team)):
                 next_round = 100
             news = get_data_bootstrap['elements'][i]['news']
 
-            if multi > 0:
+            if multiplier > 0:
                 speed_gw_points += gw_points
 
             print("%-25s %-9s %-8d %-7.1f %-6.1f %-8d %s" %
                 (name, player_status, gw_points, price, price_change, next_round, news))
-
-#TODO
-#I'm displaying the worng transfer infromation. -4 is from transfer made this gameweek. Not lasrt gameweek. 
-#The gameweek page is all about, what is happening in your current ganeweek page. 
-
-#If we are before deadline use current method. If after deadline, put last weeks 
+            
+            break
 
 print ("\n\nGameweek points: %d (%d)       \tOverall points: %-7d" %
     (speed_gw_points, get_gw_team["entry_history"]["event_transfers_cost"], 
@@ -133,8 +109,8 @@ print ("Gameweek rank:   %-7s\tOverall rank:   %-7s\n" %
     (get_gw_team["entry_history"]["rank"], get_gw_team["entry_history"]["overall_rank"]))
 
 print ("\nH2H Leagues:\n")
-print (sp*40 + "Prev" + sp*7 + "Curr" + sp*7 + "Rank" + sp*8 + "Leader")
-print ("League Name" + sp*29 + "Rank" + sp*7 + "Rank" + sp*7 + "Diff\n")
+print (sp*40 + "Prev" + sp*7 + "Curr" + sp*7 + "Rank" + sp*7 + "Leader")
+print ("League Name" + sp*29 + "Rank" + sp*7 + "Rank" + sp*7 + "Diff" + sp*7 + "Points\n")
 
 for i in range(len(get_data_entry['leagues']['h2h'])):
     league_id = get_data_entry['leagues']['h2h'][i]['id']
@@ -148,12 +124,12 @@ for i in range(len(get_data_entry['leagues']['h2h'])):
     league_leader = get_data_league['standings']['results'][0]['total']
     point_differential = league_leader - get_data_league['standings']['results'][current_rank - 1]['total']
 
-    print ("%-39s %-10d %-10d %-11d %d (%d)" %
+    print ("%-39s %-10d %-10d %-10d %d (%d)" %
         (league_name, previous_rank, current_rank, rank_difference, league_leader, point_differential))
 
 print ("\n\nClassic Leagues:\n")
-print (sp*40 + "Prev" + sp*7 + "Curr" + sp*7 + "Rank" + sp*8 + "Leader")
-print ("League Name" + sp*29 + "Rank" + sp*7 + "Rank" + sp*7 + "Diff" + sp*8 + "Points\n")
+print (sp*40 + "Prev" + sp*7 + "Curr" + sp*7 + "Rank" + sp*7 + "Leader")
+print ("League Name" + sp*29 + "Rank" + sp*7 + "Rank" + sp*7 + "Diff" + sp*7 + "Points\n")
 
 for i in range (len(get_data_entry['leagues']['classic'])):
     league_id = get_data_entry['leagues']['classic'][i]['id']
@@ -168,8 +144,9 @@ for i in range (len(get_data_entry['leagues']['classic'])):
     league_leader = get_data_league['standings']['results'][0]['total']
     league_difference = league_leader - get_data_entry['summary_overall_points']
 
-    print ("%-39s %-10d %-10d %-11d %d (%d)" % (league_name, previous_rank, current_rank,
+    print ("%-39s %-10d %-10d %-10d %d (%d)" % (league_name, previous_rank, current_rank,
         rank_difference, league_leader, league_difference))
 
 print ()
+
 
