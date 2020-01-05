@@ -58,8 +58,9 @@ get_gw_team = session.get(gw_team_api).json()
 sp = ' '
 speed_gw_points = 0
 
-print ("\n" + sp*36 + "Points" + sp*11 + "+/-" + sp*4 + "Chance")
-print ("Name" + sp*32 + "(GW)" + sp*5 + "Price" + sp*3 + "(GW)" + sp*3 + "NextGW" + sp*3 + "News\n")
+print()
+print('{0: >42}'.format("Points"), '{0:>13}'.format('+/-'), '{0: >9}'.format('Chance'))
+print('Name', '{0:>35}'.format('(GW)'), '{0: >9}'.format('Price'), '{0: >6}'.format('(GW)'), '{0: >8}'.format('NextGW'), '{0: >7}'.format("News\n"))
 
 for j in range(len(get_gw_team['picks'])):
     id = get_gw_team['picks'][j]['element']

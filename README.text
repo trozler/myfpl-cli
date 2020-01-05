@@ -4,7 +4,7 @@ Three python scripts designed for command line that allow fpl users to retrieve 
 
 * Live leagues script aims to fill the gap caused by FPL being slow to update leagues during gamweeks. It provides real time league positions (net of transfers) and changes in rank, before fpl officially updates tables at the end of the gameday. Also includes every players captaincy choice and transfer hits.
 NOTE/
-Live leagues program is computationally intensive, so it is highly recommended that you don't use the program on leagues greater than 100 people. Failure to follow will lead to long waits for output.
+Live leagues program is computationally intensive, so users will be prompted after processing every 200 table entries processed, if they wish to continue or break and see output.
 
 * Gw script is intened for users interetsed in following thier team's progress during a gameweek. The gw script will correctly displays real time points (net of transfers), price changes, classic and h2h league ranks.
 

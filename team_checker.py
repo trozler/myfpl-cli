@@ -3,7 +3,7 @@ import requests, traceback, re, getpass
 #Team checker is intended of users to check their team selection for future gameweeks. 
 
 #Hardcode team-id login (login is equivelent to email) field for future. Never hardcode password.
-credentials = {'password':None,
+credentials = {'password': None,
                'login': None,
                'redirect_uri': 'https://fantasy.premierleague.com/a/login',
                'app': 'plfpl-web'
@@ -53,9 +53,9 @@ get_data_team = session.get(team_api).json()
 
 sp = ' '
 
-print()   
-print ("\n" + sp*44 + "+/-" + sp*4 + "Purchase" + sp*3 +"Chance")
-print ("Name" + sp*32 + "Price" + sp*3 + "(GW)" + sp*3 + "Price" + sp*6 + "NextGW" + sp*3 + "News\n")
+print('\n')
+print('{0: >47}'.format("+/-"), '{0:>11}'.format('Purchase'), '{0: >8}'.format('Chance'))
+print('Name', '{0:>36}'.format('Price'), '{0: >6}'.format('(GW)'), '{0: >7}'.format('Price'), '{0: >11}'.format('NextGW'), '{0: >7}'.format("News\n"))
 
 for j in range(len(get_data_team['picks'])):
     id = get_data_team['picks'][j]['element']
