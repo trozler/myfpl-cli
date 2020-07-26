@@ -13,9 +13,9 @@ Live leagues program is computationally intensive, so users will be prompted aft
 
 #For linux, run the commands below to create aliases in your bash_profile allowing you to easily invoke gameweek(fplgw), team(fplteam) and live leagues (fpllive), in a single command. 
 
-echo 'alias fplgw="python3 ~/your-path/gameweek_checker.py"' >> ~/.bash_profile
-echo 'alias fplteam="python3 ~/your-path/team_checker.py"' >> ~/.bash_profile
-echo 'alias fpllive="python3 ~/your-path/live_leagues.py"' >> ~/.bash_profile
+echo -e '\nalias fplgw="python3 ~/your-path/gameweek_checker.py"' >> ~/.bash_profile
+echo -e '\nalias fplteam="python3 ~/your-path/team_checker.py"' >> ~/.bash_profile
+echo -e '\nalias fpllive="python3 ~/your-path/live_leagues.py"' >> ~/.bash_profile
 
 NOTE/
 Users are required to know their **unique fpl entry id**. The id can be retreived on the fpl site by clicking "my team", "view gameweek history" and looking at url.
