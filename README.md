@@ -37,4 +37,4 @@ It is also highly recommended that users hardcode their emails and team ID's, at
 ## Dependencies
 
 - python3.
-- [requests module](https://pypi.org/project/requests/)
+- [requests module.](https://pypi.org/project/requests/)
