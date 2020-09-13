@@ -1,9 +1,12 @@
 
+import sys
+
+
 def gwRunner(session, get_gw_team, get_data_bootstrap, get_data_entry):
 
     sp = ' '
     print()
-    printGwTeam(get_gw_team, get_data_bootstrap, get_data_entry)
+    printGwTeam(session, get_gw_team, get_data_bootstrap, get_data_entry)
 
     print("\nH2H Leagues:\n")
     print(sp*40 + "Prev" + sp*7 + "Curr" + sp*7 + "Rank" + sp*7 + "Leader")
@@ -61,8 +64,11 @@ def gwRunner(session, get_gw_team, get_data_bootstrap, get_data_entry):
     print("\n")
 
 
-def printGwTeam(get_gw_team, get_data_bootstrap, get_data_entry):
+def printGwTeam(session, get_gw_team, get_data_bootstrap, get_data_entry):
     speed_gw_points = 0
+    player_list = {"starting": [], "bench": []}
+    # Key team, value players.
+    team_list = {}
 
     print("Gameweek:", get_data_entry["current_event"])
     print()
@@ -72,7 +78,7 @@ def printGwTeam(get_gw_team, get_data_bootstrap, get_data_entry):
         '(GW)'), '{0: >8}'.format('NextGW'), '{0: >7}'.format("News\n"))
 
     for j in range(len(get_gw_team['picks'])):
-        id = get_gw_team['picks'][j]['element']
+        ID = get_gw_team['picks'][j]['element']
         multiplier = get_gw_team['picks'][j]['multiplier']
         vice_captain = get_gw_team['picks'][j]['is_vice_captain']
         position = get_gw_team['picks'][j]['position']
@@ -89,7 +95,7 @@ def printGwTeam(get_gw_team, get_data_bootstrap, get_data_entry):
             player_status = ""
 
         for i in range(len(get_data_bootstrap['elements'])):
-            if get_data_bootstrap['elements'][i]['id'] == id:
+            if get_data_bootstrap['elements'][i]['id'] == ID:
                 name = get_data_bootstrap['elements'][i]['web_name']
                 gw_points = get_data_bootstrap['elements'][i]['event_points']
                 if multiplier == 2:
@@ -106,10 +112,44 @@ def printGwTeam(get_gw_team, get_data_bootstrap, get_data_entry):
                 if multiplier > 0:
                     speed_gw_points += gw_points
 
-                print("%-25s %-9s %-8d %-7.1f %-6.1f %-8d %s" %
-                      (name, player_status, gw_points, price, price_change, next_round, news))
+                team = get_data_bootstrap['elements'][i]["team"]
+                if team in team_list:
+                    team_list[team].append(ID)
+                else:
+                    team_list[team] = [ID]
+
+                if player_status == "(Bench)":
+                    player_list["bench"].append({
+                        "name": name,
+                        "player_status": player_status,
+                        "gw_points": gw_points,
+                        "price": price,
+                        "price_change": price_change,
+                        "next_round": next_round,
+                        "news": news,
+                        "team": team,
+                        "ID": ID
+                    })
+                else:
+                    player_list["starting"].append({
+                        "name": name,
+                        "player_status": player_status,
+                        "gw_points": gw_points,
+                        "price": price,
+                        "price_change": price_change,
+                        "next_round": next_round,
+                        "news": news,
+                        "team": team,
+                        "ID": ID
+                    })
+
+                # print("%-25s %-9s %-8d %-7.1f %-6.1f %-8d %s" %
+                #       (name, player_status, gw_points, price, price_change, next_round, news))
 
                 break
+
+    speed_gw_points = getFixtuerData(session, get_data_bootstrap,
+                                     get_data_entry, player_list, team_list, speed_gw_points)
 
     print("\n\nGameweek points: %d (%d)       \tOverall points: %-7d" %
           (speed_gw_points, get_gw_team["entry_history"]["event_transfers_cost"],
@@ -117,3 +157,87 @@ def printGwTeam(get_gw_team, get_data_bootstrap, get_data_entry):
 
     print("Gameweek rank:   %-7s\tOverall rank:   %-7s\n" %
           (get_gw_team["entry_history"]["rank"], get_gw_team["entry_history"]["overall_rank"]))
+
+
+# TODO; Include provisional bounus for all players.
+# TODO: Include players on bench if they are playing and a game has started and starting player is not playing.
+
+'''
+teams_needed:
+* Array of teams for our players.
+
+'''
+
+
+def getFixtuerData(session, get_data_bootstrap, get_data_entry, player_list, team_list, speed_gw_points) -> int:
+    fixture_url = "https://fantasy.premierleague.com/api/fixtures/?event=%s#/" % get_data_entry["current_event"]
+    get_gw_fixture = session.get(fixture_url).json()
+
+    # Iterate over players, for each player check:
+    # 1. Is he playing
+    # 2. Add prelim bonus points.
+
+    # Need to check if a player which we have starting is actually on bench:
+    # Bootstrap contains minutes a player has played.
+    # Q: When does the bootsrap minute Api update.
+    # IDEA: Maybe https://fantasy.premierleague.com/api/event/1/live/#/ updates.
+
+    # Iterate over all fixtuers
+    for g in range(len(get_gw_fixture)):
+        # Possibly add bonus points
+        if get_gw_fixture[g]["team_a"] in team_list or get_gw_fixture[g]["team_h"] in team_list:
+            # Need add provisional bonus points.
+            if get_gw_fixture[g]["started"] == True and get_gw_fixture[g]["finished_provisional"] == True and get_gw_fixture[g]["finished"] == False:
+                speed_gw_points = addBonus(get_gw_fixture, player_list, g)
+
+    return speed_gw_points
+
+
+# Returns list of top 3 players that will receive bonus.
+def addBonus(get_gw_fixture, player_list, g) -> list:
+    if len(get_gw_fixture[g]["stats"]) > 0:
+        h_i, a_i = 0, 0
+        bp_players = {}
+        n_players = 3
+
+        while n_players > 0 and h_i < len(get_gw_fixture[g]["stats"][9]["h"]) and a_i < len(get_gw_fixture[g]["stats"][9]["a"]):
+            if get_gw_fixture[g]["stats"][9]["h"][h_i]["value"] > get_gw_fixture[g]["stats"][9]["a"][a_i]["value"]:
+
+                bp_players[get_gw_fixture[g]
+                           ["stats"][9]["h"][h_i]["element"]] = n_players
+                h_i += 1
+                n_players -= 1
+            elif get_gw_fixture[g]["stats"][9]["h"][h_i]["value"] < get_gw_fixture[g]["stats"][9]["a"][a_i]["value"]:
+
+                bp_players[get_gw_fixture[g]
+                           ["stats"][9]["a"][a_i]["element"]] = n_players
+
+                a_i += 1
+                n_players -= 1
+            elif get_gw_fixture[g]["stats"][9]["h"][h_i]["value"] == get_gw_fixture[g]["stats"][9]["a"][a_i]["value"]:
+
+                bp_players[get_gw_fixture[g]
+                           ["stats"][9]["a"][a_i]["element"]] = n_players
+                bp_players[get_gw_fixture[g]
+                           ["stats"][9]["h"][h_i]["element"]] = n_players
+
+                n_players -= 2
+                h_i += 1
+                a_i += 1
+
+        # Now we need to check if any of your players are on bonus, if so increase their points.
+        for pl in range(player_list["starting"]):
+            if player_list["starting"][pl]["ID"] in bp_players:
+                player_list["starting"][pl]["gw_points"] += bp_players[player_list["starting"][pl]["ID"]]
+                speed_gw_points += bp_players[player_list["starting"][pl]["ID"]]
+
+        for pl in range(player_list["bench"]):
+            if player_list["bench"][pl]["ID"] in bp_players:
+                player_list["bench"][pl]["gw_points"] += bp_players[player_list["bench"][pl]["ID"]]
+
+    else:
+        print(
+            "Error api/fixtures has not updated game stats yet. Please try again later.")
+        sys.exit(1)
+
+    return speed_gw_points

@@ -209,7 +209,7 @@ def process_league(ID, session, get_data_entry, get_data_bootstrap):
             ID = int(input())
             if 1 <= ID <= len(user_list):
                 print("\n" + user_list[ID - 1][0])
-                printGwTeam(user_list[ID - 1][1][5],
+                printGwTeam(session, user_list[ID - 1][1][5],
                             get_data_bootstrap, get_data_entry)
         except:
             break
