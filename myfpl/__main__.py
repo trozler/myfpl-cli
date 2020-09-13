@@ -10,6 +10,7 @@ import json
 from .live import liveRunner
 from .gameweek import gwRunner
 from .team import teamRunner
+from .fixtures import fixtureRunner
 
 team_id = None
 
@@ -28,6 +29,9 @@ def addCli():
 
     parser.add_argument("-c",
                         "--clear", action="store_true", dest="clear", help="Remove your email and team id stored in config.json.")
+
+    parser.add_argument("-f",
+                        "--fixtures", action="store_true", dest="fix", help="Get real time scores from PL fixtures.")
 
     args = parser.parse_args()
     if len(sys.argv) <= 1:
@@ -222,6 +226,22 @@ def main():
 
         teamRunner(session, team_id, get_data_team,
                    get_data_bootstrap, curr_gw)
+
+    elif args.fix:
+        curr_gw = None
+        for k in range(len(get_data_bootstrap["events"])):
+            if get_data_bootstrap["events"][k]["is_current"] == True:
+                curr_gw = k + 1
+
+        # Handle errors
+        if (curr_gw) == None:
+            print("Premier League not in season, please come when season returns.")
+            sys.exit(1)
+
+        fixture_url = "https://fantasy.premierleague.com/api/fixtures/?event=%s#/" % curr_gw
+        get_gw_fixture = session.get(fixture_url).json()
+
+        fixtureRunner(get_gw_fixture, get_data_bootstrap)
 
     # TODO:Handle errors in all scripts.
     if args.clear:
