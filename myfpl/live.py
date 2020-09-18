@@ -12,10 +12,10 @@ sp = ' '
 def liveRunner(session, get_data_entry, get_data_bootstrap, get_live_points, get_gw_fixture):
     global league_map, player_map
     print("\nClassic Leagues:\n")
-    print('{0: >44}'.format('Prev'), '{0:>10}'.format('Curr'),
-          '{0: >10}'.format('Rank'), '{0: >12}'.format('Leader'))
-    print("League Name", '{0:>32}'.format('Rank'), '{0: >10}'.format(
-        'Rank'), '{0: >10}'.format('Diff'), '{0: >13}'.format("Points\n"))
+    print('{0: >54}'.format('Prev'), '{0:>10}'.format('Curr'),
+          '{0: >13}'.format('Rank'), '{0: >16}'.format('Leader'))
+    print("League Name", '{0:>42}'.format('Rank'), '{0: >10}'.format(
+        'Rank'), '{0: >13}'.format('Diff'), '{0: >17}'.format("Points\n"))
 
     for i in range(len(get_data_entry['leagues']['classic'])):
         league_id = get_data_entry['leagues']['classic'][i]['id']
@@ -39,7 +39,7 @@ def liveRunner(session, get_data_entry, get_data_bootstrap, get_live_points, get
         # Create league hashmap. Value is a tuple of name and league id.
         league_map[i] = (league_name, league_id)
 
-        print("(%d) %-35s %-10d %-10d %-10d %d (%d)" % (i, league_name, previous_rank, current_rank,
+        print("(%d) %-45s %-10d %-13d %-14d %d (%d)" % (i, league_name, previous_rank, current_rank,
                                                         rank_difference, league_leader, league_difference))
 
     # Get all fixtures that have started and get prelim bonus for each match.
@@ -66,7 +66,6 @@ def liveRunner(session, get_data_entry, get_data_bootstrap, get_live_points, get
             else:
                 process_league(ID, session, get_data_entry,
                                get_data_bootstrap, get_live_points, prelim_bonus)
-
         except:
             continue
 
@@ -131,10 +130,11 @@ def process_league(ID, session, get_data_entry, get_data_bootstrap, get_live_poi
                 elif multi > 0:
                     for j in range(len(get_data_bootstrap['elements'])):
                         if get_data_bootstrap['elements'][j]['id'] == id:
-                            gw_points = get_live_points['elements'][j]['stats']['total_points']
+                            # Need to iterate over live points.
+                            gw_points = get_data_bootstrap['elements'][j]['total_points']
                             if id in prelim_bonus:
                                 gw_points += prelim_bonus[id]
-
+                            # Issue is here, cannot do get_live_points
                             player_map[id] = (
                                 gw_points, get_data_bootstrap['elements'][j]['web_name'])
                             if multi == 2:
@@ -222,13 +222,52 @@ def process_league(ID, session, get_data_entry, get_data_bootstrap, get_live_poi
         print("%-44s %-9d %-9d %-8d %-27s %-7d %d (%d)" % (user_list[i][0], i + 1, user_list[i][1][2], user_list[i][1][2] - (i + 1), ((user_list[i][1][4][1] + ' ('+str(
             user_list[i][1][4][0]) + ')' + '(TC)') if user_list[i][1][4][2] else user_list[i][1][4][1] + ' ('+str(user_list[i][1][4][0]) + ')'), user_list[i][1][3], user_list[i][1][0], user_list[i][1][1]))
 
+    live_points_cache = {}
     while True:
         print("\nView a players team by entering their current rank:")
         try:
             ID = int(input())
             if 1 <= ID <= len(user_list):
+                player_list = {"starting": [],
+                               "bench": [], "formation": [0, 0, 0, 0]}
+                get_gw_team = user_list[ID - 1][1][5]
+                speed_gw_points = 0
                 print("\n" + user_list[ID - 1][0])
-                printGwTeam(session, user_list[ID - 1][1][5],
-                            get_data_bootstrap, get_data_entry, get_live_points)
+                print("Gameweek:", get_data_entry["current_event"])
+                print()
+                print('{0: >42}'.format("Points"), '{0:>13}'.format(
+                    '+/-'), '{0: >9}'.format('Chance'))
+                print('Name', '{0:>35}'.format('(GW)'), '{0: >9}'.format('Price'), '{0: >6}'.format(
+                    '(GW)'), '{0: >8}'.format('NextGW'), '{0: >7}'.format("News\n"))
+
+                printGwTeam(session, get_gw_team,
+                            get_data_bootstrap, get_data_entry, get_live_points, player_list, live_points_cache)
+
+                for pl in player_list["starting"]:
+                    gw_points = live_points_cache[pl["ID"]
+                                                  ]['stats']['total_points']
+                    if pl["multiplier"] == 2:
+                        gw_points *= 2
+                    elif pl["multiplier"] == 3:
+                        gw_points *= 3
+                    pl["tot_gw_points"] += gw_points
+                    speed_gw_points += gw_points
+                    print("%-25s %-9s %-8d %-7.1f %-6.1f %-8d %s" %
+                          (pl["name"], pl["player_status"], pl["tot_gw_points"], pl["price"], pl["price_change"], pl["next_round"], pl["news"]))
+
+                for pl in player_list["bench"]:
+                    gw_points = live_points_cache[pl["ID"]
+                                                  ]['stats']['total_points']
+                    pl["tot_gw_points"] += gw_points
+                    print("%-25s %-9s %-8d %-7.1f %-6.1f %-8d %s" %
+                          (pl["name"], pl["player_status"], pl["tot_gw_points"], pl["price"], pl["price_change"], pl["next_round"], pl["news"]))
+
+                print("\n\nGameweek points: %d (%d)       \tOverall points: %-7d" %
+                      (speed_gw_points, get_gw_team["entry_history"]["event_transfers_cost"],
+                       get_gw_team["entry_history"]["total_points"]))
+
+                print("Gameweek rank:   %-7s\tOverall rank:   %-7s\n" %
+                      (get_gw_team["entry_history"]["rank"], get_gw_team["entry_history"]["overall_rank"]))
+
         except:
             break

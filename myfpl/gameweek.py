@@ -1,6 +1,5 @@
 
-import json
-
+# import json
 
 def gwRunner(session, get_gw_team, get_data_bootstrap, get_data_entry, get_live_points):
 
@@ -180,17 +179,19 @@ def printGwTeam(session, get_gw_team, get_data_bootstrap, get_data_entry, get_li
     # Populate live_points_cache here.
     for k in range(len(player_list["bench"])):
         ID = player_list["bench"][k]["ID"]
-        for i in range(len(get_live_points['elements'])):
-            if get_live_points['elements'][i]['id'] == ID:
-                live_points_cache[ID] = get_live_points['elements'][i]
-                break
+        if ID not in live_points_cache:
+            for i in range(len(get_live_points['elements'])):
+                if get_live_points['elements'][i]['id'] == ID:
+                    live_points_cache[ID] = get_live_points['elements'][i]
+                    break
 
     for k in range(len(player_list["starting"])):
         ID = player_list["starting"][k]["ID"]
-        for i in range(len(get_live_points['elements'])):
-            if get_live_points['elements'][i]['id'] == ID:
-                live_points_cache[ID] = get_live_points['elements'][i]
-                break
+        if ID not in live_points_cache:
+            for i in range(len(get_live_points['elements'])):
+                if get_live_points['elements'][i]['id'] == ID:
+                    live_points_cache[ID] = get_live_points['elements'][i]
+                    break
 
     if not get_data_bootstrap["events"][0]["finished"]:
         getFixtuerData(session, get_data_bootstrap, get_data_entry,
