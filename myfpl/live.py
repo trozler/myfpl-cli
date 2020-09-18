@@ -1,6 +1,7 @@
 
 from collections import OrderedDict
-from .gameweek import printGwTeam
+from .gameweek import printGwTeam, find_prelim_bonus
+
 
 # Globals
 league_map = OrderedDict()
@@ -8,7 +9,7 @@ player_map = OrderedDict()
 sp = ' '
 
 
-def liveRunner(session, get_data_entry, get_data_bootstrap):
+def liveRunner(session, get_data_entry, get_data_bootstrap, get_live_points, get_gw_fixture):
     global league_map, player_map
     print("\nClassic Leagues:\n")
     print('{0: >44}'.format('Prev'), '{0:>10}'.format('Curr'),
@@ -41,6 +42,17 @@ def liveRunner(session, get_data_entry, get_data_bootstrap):
         print("(%d) %-35s %-10d %-10d %-10d %d (%d)" % (i, league_name, previous_rank, current_rank,
                                                         rank_difference, league_leader, league_difference))
 
+    # Get all fixtures that have started and get prelim bonus for each match.
+    started = []
+    prelim_bonus = {}  # FInd all prelim bonus and add to a map.
+
+    for g in range(len(get_gw_fixture)):
+        if get_gw_fixture[g]["finished"] == False and get_gw_fixture[g]["started"] == True:
+            started.append(get_gw_fixture[g])
+            bonus_points = find_prelim_bonus(started[g])
+            for k, v in bonus_points.items():
+                prelim_bonus[k] = v
+
     while True:
         print(
             "\nEnter the ID (left of name) of the league you want live standings for or q to exit:")
@@ -52,7 +64,8 @@ def liveRunner(session, get_data_entry, get_data_bootstrap):
             if ID not in league_map:
                 continue
             else:
-                process_league(ID, session, get_data_entry, get_data_bootstrap)
+                process_league(ID, session, get_data_entry,
+                               get_data_bootstrap, get_live_points, prelim_bonus)
 
         except:
             continue
@@ -60,7 +73,7 @@ def liveRunner(session, get_data_entry, get_data_bootstrap):
     print()
 
 
-def process_league(ID, session, get_data_entry, get_data_bootstrap):
+def process_league(ID, session, get_data_entry, get_data_bootstrap, get_live_points, prelim_bonus):
     global league_map, player_map
     # Orderd dict for sorting efficiency
     user_map = OrderedDict()
@@ -101,6 +114,9 @@ def process_league(ID, session, get_data_entry, get_data_bootstrap):
 
                 if multi > 0 and id in player_map:
                     gw_points = player_map[id][0]
+                    if id in prelim_bonus:
+                        gw_points += prelim_bonus[id]
+
                     if multi == 2:
                         # Mark as captain
                         gw_points *= 2
@@ -115,7 +131,10 @@ def process_league(ID, session, get_data_entry, get_data_bootstrap):
                 elif multi > 0:
                     for j in range(len(get_data_bootstrap['elements'])):
                         if get_data_bootstrap['elements'][j]['id'] == id:
-                            gw_points = get_data_bootstrap['elements'][j]['event_points']
+                            gw_points = get_live_points['elements'][j]['stats']['total_points']
+                            if id in prelim_bonus:
+                                gw_points += prelim_bonus[id]
+
                             player_map[id] = (
                                 gw_points, get_data_bootstrap['elements'][j]['web_name'])
                             if multi == 2:
@@ -210,6 +229,6 @@ def process_league(ID, session, get_data_entry, get_data_bootstrap):
             if 1 <= ID <= len(user_list):
                 print("\n" + user_list[ID - 1][0])
                 printGwTeam(session, user_list[ID - 1][1][5],
-                            get_data_bootstrap, get_data_entry)
+                            get_data_bootstrap, get_data_entry, get_live_points)
         except:
             break
