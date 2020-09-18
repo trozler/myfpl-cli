@@ -87,6 +87,6 @@ Users are required to know their **unique fpl entry id**. The id can be retreive
 Example: https://fantasy.premierleague.com/entry/{team-id}/history
 
 [1]: https://img.shields.io/badge/Shell-Bash-89e051
-[2]: https://img.shields.io/badge/python-3-blue
+[2]: https://img.shields.io/badge/python-3.3+-blue
 [3]: https://img.shields.io/badge/license-MIT-orange
 [4]: https://img.shields.io/badge/python-requests-%23da86c5

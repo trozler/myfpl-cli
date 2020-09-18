@@ -5,6 +5,7 @@ teststuff/
 plan.md
 scripts/
 myfpl/__pycache__/
+test*
 # Compiled python modules.
 *.pyc
 

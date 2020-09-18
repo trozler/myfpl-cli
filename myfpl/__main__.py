@@ -2,7 +2,6 @@
 
 import requests
 import getpass
-import re
 import argparse
 import sys
 import json
@@ -10,6 +9,7 @@ import json
 from .live import liveRunner
 from .gameweek import gwRunner
 from .team import teamRunner
+from .fixtures import fixtureRunner
 
 team_id = None
 
@@ -28,6 +28,9 @@ def addCli():
 
     parser.add_argument("-c",
                         "--clear", action="store_true", dest="clear", help="Remove your email and team id stored in config.json.")
+
+    parser.add_argument("-f",
+                        "--fixtures", action="store_true", dest="fix", help="Get real time scores from PL fixtures.")
 
     args = parser.parse_args()
     if len(sys.argv) <= 1:
@@ -129,7 +132,7 @@ def clearConfig():
 
 
 def main():
-    global team_id  # 27857
+    global team_id
 
     credentials = {'password': None,
                    'login': None,
@@ -147,9 +150,8 @@ def main():
     # Shoudl not ask for password.
     if args.gameweek:
 
-        handleTeamId()  # Populate team_id
+        handleTeamId()
 
-        # Entry section. No login needed.
         entry_api = 'https://fantasy.premierleague.com/api/entry/%s/' % team_id
         get_data_entry = session.get(entry_api).json()
 
@@ -169,14 +171,22 @@ def main():
             team_id, get_data_entry["current_event"])
         get_gw_team = session.get(gw_team_api).json()
 
+        live_points_url = "https://fantasy.premierleague.com/api/event/%s/live/#/" % get_data_entry["current_event"]
+        get_live_points = session.get(live_points_url).json()
+
+        # testing
+        # get_live_points = None
+        # with open('./teststuff/test3.json') as jf:
+        #     get_live_points = json.load(jf)
+        # testing
+
         gwRunner(session, get_gw_team, get_data_bootstrap,
-                 get_data_entry)
+                 get_data_entry, get_live_points)
 
     # Should not ask for password.
     elif args.live:
 
-        handleTeamId()  # Populate team_id
-
+        handleTeamId()
         entry_api = 'https://fantasy.premierleague.com/api/entry/%s/' % team_id
         get_data_entry = session.get(entry_api).json()
 
@@ -190,7 +200,14 @@ def main():
                 "Premier League not in season, please come when season returns.")
             sys.exit(1)
 
-        liveRunner(session, get_data_entry, get_data_bootstrap)
+        live_points_url = "https://fantasy.premierleague.com/api/event/%s/live/#/" % get_data_entry["current_event"]
+        get_live_points = session.get(live_points_url).json()
+
+        fixture_url = "https://fantasy.premierleague.com/api/fixtures/?event=%s#/" % get_data_entry["current_event"]
+        get_gw_fixture = session.get(fixture_url).json()
+
+        liveRunner(session, get_data_entry,
+                   get_data_bootstrap, get_live_points, get_gw_fixture)
 
     # Password needed
     elif args.team:
@@ -223,11 +240,34 @@ def main():
         teamRunner(session, team_id, get_data_team,
                    get_data_bootstrap, curr_gw)
 
-    # TODO:Handle errors in all scripts.
+    elif args.fix:
+        curr_gw = None
+        for k in range(len(get_data_bootstrap["events"])):
+            if get_data_bootstrap["events"][k]["is_current"] == True:
+                curr_gw = k + 1
+
+        # Handle errors
+        if (curr_gw) == None:
+            print("Premier League not in season, please come back when season returns.")
+            sys.exit(1)
+
+        fixture_url = "https://fantasy.premierleague.com/api/fixtures/?event=%s#/" % curr_gw
+        get_gw_fixture = session.get(fixture_url).json()
+
+        # testing
+        # get_gw_fixture = None
+        # with open('./teststuff/test2.json') as jf:
+        #     get_gw_fixture = json.load(jf)
+        # testing
+
+        if not get_gw_fixture:
+            print("No fixtures currently available, please try again later.")
+        else:
+            fixtureRunner(get_gw_fixture, get_data_bootstrap, curr_gw)
+
     if args.clear:
         clearConfig()
 
 
-# Code will only run of this is main entry point to our package.
 if __name__ == "__main__":
     main()
