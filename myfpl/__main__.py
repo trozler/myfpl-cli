@@ -2,7 +2,6 @@
 
 import requests
 import getpass
-import re
 import argparse
 import sys
 import json
@@ -133,7 +132,7 @@ def clearConfig():
 
 
 def main():
-    global team_id  # 27857
+    global team_id
 
     credentials = {'password': None,
                    'login': None,

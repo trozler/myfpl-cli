@@ -6,6 +6,7 @@ def gwRunner(session, get_gw_team, get_data_bootstrap, get_data_entry, get_live_
     sp = ' '
     player_list = {"starting": [], "bench": [], "formation": [0, 0, 0, 0]}
     live_points_cache = {}
+    player_cache = {}
     speed_gw_points = 0
     print()
 
@@ -17,7 +18,7 @@ def gwRunner(session, get_gw_team, get_data_bootstrap, get_data_entry, get_live_
         '(GW)'), '{0: >8}'.format('NextGW'), '{0: >7}'.format("News\n"))
 
     printGwTeam(session, get_gw_team, get_data_bootstrap,
-                get_data_entry, get_live_points, player_list, live_points_cache)
+                get_data_entry, get_live_points, player_list, live_points_cache, player_cache)
 
     for pl in player_list["starting"]:
         gw_points = live_points_cache[pl["ID"]]['stats']['total_points']
@@ -99,7 +100,7 @@ def gwRunner(session, get_gw_team, get_data_bootstrap, get_data_entry, get_live_
     print("\n")
 
 
-def printGwTeam(session, get_gw_team, get_data_bootstrap, get_data_entry, get_live_points, player_list, live_points_cache):
+def printGwTeam(session, get_gw_team, get_data_bootstrap, get_data_entry, get_live_points, player_list, live_points_cache, player_cache):
 
     # Key team, value players.
     team_list = {}
@@ -123,58 +124,98 @@ def printGwTeam(session, get_gw_team, get_data_bootstrap, get_data_entry, get_li
         else:
             player_status = ""
 
-        for i in range(len(get_data_bootstrap['elements'])):
-            if get_data_bootstrap['elements'][i]['id'] == ID:
-                name = get_data_bootstrap['elements'][i]['web_name']
+        if ID in player_cache:
+            temp = player_cache[ID].copy()
+            temp["player_status"] = player_status
+            temp["team_position"] = team_position
+            temp["multiplier"] = multiplier
 
-                price = get_data_bootstrap['elements'][i]['now_cost'] / 10
-                price_change = get_data_bootstrap['elements'][i]['cost_change_event'] / 10
-                next_round = get_data_bootstrap['elements'][i]['chance_of_playing_next_round']
-                if next_round == None:
-                    next_round = 100
-                news = get_data_bootstrap['elements'][i]['news']
+            if player_status == "(Bench)":
+                player_list["bench"].append(temp)
+            else:
+                player_list["starting"].append(temp)
+                player_list["formation"][temp["element_type"] - 1] += 1
+        else:
+            for i in range(len(get_data_bootstrap['elements'])):
+                if get_data_bootstrap['elements'][i]['id'] == ID:
+                    name = get_data_bootstrap['elements'][i]['web_name']
 
-                team = get_data_bootstrap['elements'][i]["team"]
-                if team in team_list:
-                    team_list[team].append(ID)
-                else:
-                    team_list[team] = [ID]
+                    price = get_data_bootstrap['elements'][i]['now_cost'] / 10
+                    price_change = get_data_bootstrap['elements'][i]['cost_change_event'] / 10
+                    next_round = get_data_bootstrap['elements'][i]['chance_of_playing_next_round']
+                    if next_round == None:
+                        next_round = 100
+                    news = get_data_bootstrap['elements'][i]['news']
 
-                if player_status == "(Bench)":
-                    player_list["bench"].append({
-                        "name": name,
-                        "player_status": player_status,
-                        "tot_gw_points": 0,  # Added later.
-                        "price": price,
-                        "price_change": price_change,
-                        "next_round": next_round,
-                        "news": news,
-                        "team": team,
-                        "ID": ID,
-                        "element_type": get_data_bootstrap['elements'][i]["element_type"],
-                        "team_position": team_position,
-                        "multiplier": multiplier,
-                    })
-                else:
-                    player_list["starting"].append({
-                        "name": name,
-                        "player_status": player_status,
-                        "tot_gw_points": 0,  # Added later.
-                        "price": price,
-                        "price_change": price_change,
-                        "next_round": next_round,
-                        "news": news,
-                        "team": team,
-                        "ID": ID,
-                        "element_type": get_data_bootstrap['elements'][i]["element_type"],
-                        "team_position": team_position,
-                        "multiplier": multiplier,
-                    })
+                    team = get_data_bootstrap['elements'][i]["team"]
+                    if team in team_list:
+                        team_list[team].append(ID)
+                    else:
+                        team_list[team] = [ID]
 
-                    player_list["formation"][player_list["starting"]
-                                             [j]["element_type"] - 1] += 1
+                    if player_status == "(Bench)":
+                        player_list["bench"].append({
+                            "name": name,
+                            "player_status": player_status,
+                            "tot_gw_points": 0,  # Added later.
+                            "price": price,
+                            "price_change": price_change,
+                            "next_round": next_round,
+                            "news": news,
+                            "team": team,
+                            "ID": ID,
+                            "element_type": get_data_bootstrap['elements'][i]["element_type"],
+                            "team_position": team_position,
+                            "multiplier": multiplier
+                        })
+                        player_cache[ID] = {
+                            "name": name,
+                            "player_status": None,
+                            "tot_gw_points": 0,  # Added later.
+                            "price": price,
+                            "price_change": price_change,
+                            "next_round": next_round,
+                            "news": news,
+                            "team": team,
+                            "ID": ID,
+                            "element_type": get_data_bootstrap['elements'][i]["element_type"],
+                            "team_position": None,  # Team specific.
+                            "multiplier": None  # Team specific
+                        }
+                    else:
+                        player_list["starting"].append({
+                            "name": name,
+                            "player_status": player_status,
+                            "tot_gw_points": 0,  # Added later.
+                            "price": price,
+                            "price_change": price_change,
+                            "next_round": next_round,
+                            "news": news,
+                            "team": team,
+                            "ID": ID,
+                            "element_type": get_data_bootstrap['elements'][i]["element_type"],
+                            "team_position": team_position,
+                            "multiplier": multiplier
+                        })
+                        player_cache[ID] = {
+                            "name": name,
+                            "player_status": None,
+                            # Added later.
+                            "tot_gw_points": 0,
+                            "price": price,
+                            "price_change": price_change,
+                            "next_round": next_round,
+                            "news": news,
+                            "team": team,
+                            "ID": ID,
+                            "element_type": get_data_bootstrap['elements'][i]["element_type"],
+                            "team_position": None,  # Team specific.
+                            "multiplier": None  # Team specific
+                        }
+                        player_list["formation"][get_data_bootstrap['elements']
+                                                 [i]["element_type"] - 1] += 1
 
-                break
+                    break
 
     # Populate live_points_cache here.
     for k in range(len(player_list["bench"])):
@@ -263,10 +304,10 @@ def getFixtuerData(session, get_data_bootstrap, get_data_entry, player_list, tea
 '''
 Edge cases:
 * Need to maintain the minimum number of players in each position:
-    - golakeeper can only replace goal keeper. 
-    - If playing 3 at the back, and defender not playing. Only another defender can replace that defender. 
-    - If playing 1 striker, only striker can replace that striker. 
-    - If playing 3 midfield, only midfielder can replace that midfielder. 
+    - golakeeper can only replace goal keeper.
+    - If playing 3 at the back, and defender not playing. Only another defender can replace that defender.
+    - If playing 1 striker, only striker can replace that striker.
+    - If playing 3 midfield, only midfielder can replace that midfielder.
 '''
 
 
@@ -323,7 +364,8 @@ def make_sub(index_of_sub, player_list, finished, started, upcoming, live_points
             player_list["bench"][j]["multiplier"] = 1
             player_to_swap["multiplier"] = 0
 
-            player_list["bench"][j]["team_position"], player_to_swap["team_position"] = player_to_swap["team_position"], player_list["bench"][j]["team_position"]
+            player_list["bench"][j]["team_position"], player_to_swap["team_position"] = player_to_swap[
+                "team_position"], player_list["bench"][j]["team_position"]
 
             # Need to swap elements in starting and bench array.
             player_list["bench"][j], player_list["starting"][index_of_sub] = player_list["starting"][index_of_sub], player_list["bench"][j]

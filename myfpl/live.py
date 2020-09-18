@@ -1,16 +1,18 @@
 
 from collections import OrderedDict
-from .gameweek import printGwTeam, find_prelim_bonus
+from .gameweek import printGwTeam
 
 
 # Globals
 league_map = OrderedDict()
-player_map = OrderedDict()
+live_points_cache = {}  # Used to cache api/live
+# Used to cache api/bootstrap. Will store templates that are filled out with team specific info.
+player_cache = {}
 sp = ' '
 
 
 def liveRunner(session, get_data_entry, get_data_bootstrap, get_live_points, get_gw_fixture):
-    global league_map, player_map
+    global league_map
     print("\nClassic Leagues:\n")
     print('{0: >54}'.format('Prev'), '{0:>10}'.format('Curr'),
           '{0: >13}'.format('Rank'), '{0: >16}'.format('Leader'))
@@ -42,17 +44,6 @@ def liveRunner(session, get_data_entry, get_data_bootstrap, get_live_points, get
         print("(%d) %-45s %-10d %-13d %-14d %d (%d)" % (i, league_name, previous_rank, current_rank,
                                                         rank_difference, league_leader, league_difference))
 
-    # Get all fixtures that have started and get prelim bonus for each match.
-    started = []
-    prelim_bonus = {}  # FInd all prelim bonus and add to a map.
-
-    for g in range(len(get_gw_fixture)):
-        if get_gw_fixture[g]["finished"] == False and get_gw_fixture[g]["started"] == True:
-            started.append(get_gw_fixture[g])
-            bonus_points = find_prelim_bonus(started[g])
-            for k, v in bonus_points.items():
-                prelim_bonus[k] = v
-
     while True:
         print(
             "\nEnter the ID (left of name) of the league you want live standings for or q to exit:")
@@ -65,15 +56,15 @@ def liveRunner(session, get_data_entry, get_data_bootstrap, get_live_points, get
                 continue
             else:
                 process_league(ID, session, get_data_entry,
-                               get_data_bootstrap, get_live_points, prelim_bonus)
+                               get_data_bootstrap, get_live_points)
         except:
             continue
 
     print()
 
 
-def process_league(ID, session, get_data_entry, get_data_bootstrap, get_live_points, prelim_bonus):
-    global league_map, player_map
+def process_league(ID, session, get_data_entry, get_data_bootstrap, get_live_points):
+    global league_map, live_points_cache, player_cache
     # Orderd dict for sorting efficiency
     user_map = OrderedDict()
     page_num = 1
@@ -95,72 +86,34 @@ def process_league(ID, session, get_data_entry, get_data_bootstrap, get_live_poi
                 team_id, gameweek)
             get_gw_team = session.get(gw_team_api).json()
             # get old gw points - costly try and find improvement in future
+            gw_old_points = 0
             if gameweek > 1:
                 gw_team_old_api = 'https://fantasy.premierleague.com/api/entry/%s/event/%s/picks/' % (
                     team_id, gameweek - 1)
                 get_gw_old_team = session.get(gw_team_old_api).json()
                 gw_old_points = get_gw_old_team["entry_history"]["total_points"]
-            else:
-                gw_old_points = 0
 
-            speed_gw_points = 0
             # Captain points(already doubled), Name, triple (boolean)
             captain_id_name = [None, None, False]
+            speed_gw_points = 0
+            player_list = {"starting": [],
+                           "bench": [], "formation": [0, 0, 0, 0]}
 
-            for pl in range(len(get_gw_team['picks'])):
-                id = get_gw_team['picks'][pl]['element']
-                multi = get_gw_team['picks'][pl]['multiplier']
+            printGwTeam(session, get_gw_team, get_data_bootstrap,
+                        get_data_entry, get_live_points, player_list, live_points_cache, player_cache)
 
-                if multi > 0 and id in player_map:
-                    gw_points = player_map[id][0]
-                    if id in prelim_bonus:
-                        gw_points += prelim_bonus[id]
+            for pl in player_list["starting"]:
+                gw_points = live_points_cache[pl["ID"]
+                                              ]['stats']['total_points']
+                if pl["multiplier"] == 2:
+                    gw_points *= 2
+                    captain_id_name[0], captain_id_name[1], captain_id_name[2] = gw_points, pl["name"], False
+                elif pl["multiplier"] == 3:
+                    gw_points *= 3
+                    captain_id_name[0], captain_id_name[1], captain_id_name[2] = gw_points, pl["name"], True
 
-                    if multi == 2:
-                        # Mark as captain
-                        gw_points *= 2
-                        captain_id_name[0], captain_id_name[1] = gw_points, player_map[id][1]
-                    elif multi == 3:
-                        # Mark as Tripple captain
-                        gw_points *= 3
-                        captain_id_name[0], captain_id_name[1], captain_id_name[2] = gw_points, player_map[id][1], True
-
-                    speed_gw_points += gw_points
-
-                elif multi > 0:
-                    for j in range(len(get_data_bootstrap['elements'])):
-                        if get_data_bootstrap['elements'][j]['id'] == id:
-                            # Need to iterate over live points.
-                            gw_points = get_data_bootstrap['elements'][j]['total_points']
-                            if id in prelim_bonus:
-                                gw_points += prelim_bonus[id]
-                            # Issue is here, cannot do get_live_points
-                            player_map[id] = (
-                                gw_points, get_data_bootstrap['elements'][j]['web_name'])
-                            if multi == 2:
-                                # Mark as captain
-                                gw_points *= 2
-                                captain_id_name[0], captain_id_name[1] = gw_points, player_map[id][1]
-                            elif multi == 3:
-                                # Mark as Triple captain
-                                gw_points *= 3
-                                captain_id_name[0], captain_id_name[1], captain_id_name[2] = gw_points, player_map[id][1], True
-
-                            speed_gw_points += gw_points
-                            break
-
-                # Captain didn't play, was substituted and Vice didn't play.
-                elif get_gw_team['picks'][pl]['is_captain'] and captain_id_name[0] == None:
-                    if id in player_map:
-                        captain_id_name[0], captain_id_name[1] = 0, player_map[id][1]
-                    # Player is not in player map. Need to find in bootstrap.
-                    else:
-                        for j in range(len(get_data_bootstrap['elements'])):
-                            if get_data_bootstrap['elements'][j]['id'] == id:
-                                player_map[id] = (
-                                    0, get_data_bootstrap['elements'][j]['web_name'])
-                                break
-                        captain_id_name[0], captain_id_name[1] = 0, player_map[id][1]
+                pl["tot_gw_points"] += gw_points
+                speed_gw_points += gw_points
 
             # Have Team name + person name of as key. Value is a tuple:
             # (gw-1 points + gw points - hits, gw points - hits, previous rank, hits, gw team)
@@ -222,7 +175,6 @@ def process_league(ID, session, get_data_entry, get_data_bootstrap, get_live_poi
         print("%-44s %-9d %-9d %-8d %-27s %-7d %d (%d)" % (user_list[i][0], i + 1, user_list[i][1][2], user_list[i][1][2] - (i + 1), ((user_list[i][1][4][1] + ' ('+str(
             user_list[i][1][4][0]) + ')' + '(TC)') if user_list[i][1][4][2] else user_list[i][1][4][1] + ' ('+str(user_list[i][1][4][0]) + ')'), user_list[i][1][3], user_list[i][1][0], user_list[i][1][1]))
 
-    live_points_cache = {}
     while True:
         print("\nView a players team by entering their current rank:")
         try:
@@ -241,7 +193,7 @@ def process_league(ID, session, get_data_entry, get_data_bootstrap, get_live_poi
                     '(GW)'), '{0: >8}'.format('NextGW'), '{0: >7}'.format("News\n"))
 
                 printGwTeam(session, get_gw_team,
-                            get_data_bootstrap, get_data_entry, get_live_points, player_list, live_points_cache)
+                            get_data_bootstrap, get_data_entry, get_live_points, player_list, live_points_cache, player_cache)
 
                 for pl in player_list["starting"]:
                     gw_points = live_points_cache[pl["ID"]
