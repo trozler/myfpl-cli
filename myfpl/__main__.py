@@ -6,10 +6,10 @@ import argparse
 import sys
 import json
 
-from .live import liveRunner
-from .gameweek import gwRunner
-from .team import teamRunner
-from .fixtures import fixtureRunner
+from myfpl.live import liveRunner
+from myfpl.gameweek import gwRunner
+from myfpl.team import teamRunner
+from myfpl.fixtures import fixtureRunner
 
 team_id = None
 
@@ -20,11 +20,11 @@ def addCli():
         epilog="\n"
     )
     parser.add_argument("-g", "--gameweek", action="store_true", dest="gameweek",
-                        help="See how your current gameweek is going by viewing points and league positions, as updated by fpl.")
+                        help="See how your gameweek is going by viewing your real time score, adjusted for preliminary bonus and substitutions.")
     parser.add_argument("-t",
                         "--team", action="store_true", dest="team", help="Plan for future gameweeks by viewing transfers made, chips avialable, currently selected team and more.")
     parser.add_argument("-l",
-                        "--live", action="store_true", dest="live", help="Show your classical league standings in real time, find out who your competitors have captained and how many transfers they made.")
+                        "--live", action="store_true", dest="live", help="Check out your league standings before fpl updates. All standings are based on real time scores, which are adjusted for preliminary bonus and substitutions.")
 
     parser.add_argument("-c",
                         "--clear", action="store_true", dest="clear", help="Remove your email and team id stored in config.json.")
@@ -131,7 +131,7 @@ def clearConfig():
         json.dump(config_data, jf, ensure_ascii=False, indent=4)
 
 
-def main():
+def main():  # 27857
     global team_id
 
     credentials = {'password': None,
@@ -263,7 +263,7 @@ def main():
         if not get_gw_fixture:
             print("No fixtures currently available, please try again later.")
         else:
-            fixtureRunner(get_gw_fixture, get_data_bootstrap, curr_gw)
+            fixtureRunner(session, get_gw_fixture, get_data_bootstrap, curr_gw)
 
     if args.clear:
         clearConfig()

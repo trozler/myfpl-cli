@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 
 def teamRunner(session, team_id, get_data_team, get_data_bootstrap, curr_gw):
     sp = ' '

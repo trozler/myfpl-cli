@@ -59,25 +59,14 @@ Any version of python 3 will work.
 
 ### How to install
 
+If you want to clone using git instead of pip, here's how you do it.
+
 ```
 $ cd ~
 $ git clone https://github.com/trozler/myfpl.git
 $ cd myfpl
 $ pip3 install -r requirements.txt
-```
-
-For ease of use it is highly recommended that you create an alias for the package.
-
-- If you know you are using a bash shell do:
-
-```
-echo -e '\nalias myfpl="python3 -m ~/myfpl/myfpl"' >> ~/.bash_profile
-```
-
-- Otherwise this will work:
-
-```
-echo -e '\nalias myfpl="python3 -m ~/myfpl/myfpl"' >> ~/.profile
+$ python -m myfpl <args>
 ```
 
 ### Usage
@@ -90,3 +79,31 @@ Example: https://fantasy.premierleague.com/entry/{team-id}/history
 [2]: https://img.shields.io/badge/python-3.3+-blue
 [3]: https://img.shields.io/badge/license-MIT-orange
 [4]: https://img.shields.io/badge/python-requests-%23da86c5
+
+```
+The -m option searches sys.path for the module name and runs its content as
+
+When you import a module, what really happens is that you load its contents for later access and use.
+
+The file with the Python code must be located in your current working directory.
+The file must be in the Python Module Search Path (PMSP), where Python looks for the modules and packages you import.
+
+sys.path is equal to python path.
+Essentially every folder with python code you want to add to the syspath needs an **init**.py file. These **init**.py files can be empty.
+
+```
+
+## Configuration options
+
+- -g, --gameweek
+  - See how your gameweek is going before fpl updates, by viewing your real time score, adjusted for preliminary bonus and substitutions.
+- -t, --team
+  - Plan for future gameweeks by viewing transfers made, chips avialable, currently selected team and more.
+- -l, --live
+  - Check out your league standings before fpl updates. All standings are based on real time scores, which are adjusted for preliminary bonus and substitutions.
+- -f, --fixture
+  - Get real time scores from PL fixtures.
+- -c, --clear
+  - Remove your email and team id stored in config.json.
+- -h, --help
+  - Show help for all commands.

@@ -1,6 +1,7 @@
+#!/usr/bin/env python3
 
 from collections import OrderedDict
-from .gameweek import printGwTeam
+from myfpl.gameweek import printGwTeam
 
 
 # Globals
@@ -172,8 +173,8 @@ def process_league(ID, session, get_data_entry, get_data_bootstrap, get_live_poi
         'Diff'), '{0: >11}'.format('Captain'), '{0: >24}'.format('Hits'), '{0: >10}'.format("Points\n"))
 
     for i in range(len(user_list)):
-        print("%-44s %-9d %-9d %-8d %-27s %-7d %d (%d)" % (user_list[i][0], i + 1, user_list[i][1][2], user_list[i][1][2] - (i + 1), ((user_list[i][1][4][1] + ' ('+str(
-            user_list[i][1][4][0]) + ')' + '(TC)') if user_list[i][1][4][2] else user_list[i][1][4][1] + ' ('+str(user_list[i][1][4][0]) + ')'), user_list[i][1][3], user_list[i][1][0], user_list[i][1][1]))
+        print("%-44s %-9d %-9d %-8d %-27s %-7d %-3d (%d)" % (user_list[i][0], i + 1, user_list[i][1][2], user_list[i][1][2] - (i + 1), ((user_list[i][1][4][1] + ' ('+str(
+            user_list[i][1][4][0]) + ')' + '(TC)') if user_list[i][1][4][2] else user_list[i][1][4][1] + ' ('+str(user_list[i][1][4][0]) + ')'), user_list[i][1][3], user_list[i][1][1], user_list[i][1][0]))
 
     while True:
         print("\nView a players team by entering their current rank:")

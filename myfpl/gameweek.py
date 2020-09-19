@@ -1,5 +1,4 @@
-
-# import json
+#!/usr/bin/env python3
 
 def gwRunner(session, get_gw_team, get_data_bootstrap, get_data_entry, get_live_points):
 
