@@ -138,7 +138,7 @@ def clearConfig():
         json.dump(config_data, jf, ensure_ascii=False, indent=4)
 
 
-def main():  # 27857
+def main():
     global team_id
 
     credentials = {'password': None,

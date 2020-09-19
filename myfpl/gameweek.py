@@ -382,21 +382,35 @@ def find_prelim_bonus(fixture):
     h_i, a_i = 0, 0
     bp_players = {}
     n_players = 3
+    record = {"last_bps_score": -1, "last_bonus": -1}
 
     while n_players > 0 and h_i < len(fixture["stats"][9]["h"]) and a_i < len(fixture["stats"][9]["a"]):
         if fixture["stats"][9]["h"][h_i]["value"] > fixture["stats"][9]["a"][a_i]["value"]:
+            if fixture["stats"][9]["h"][h_i]["value"] == record["last_bps_score"]:
+                bp_players[fixture
+                           ["stats"][9]["h"][h_i]["element"]] = record["last_bonus"]
+            else:
+                bp_players[fixture["stats"][9]["h"]
+                           [h_i]["element"]] = n_players
+                record["last_bonus"] = n_players
+                record["last_bps_score"] = fixture["stats"][9]["h"][h_i]["value"]
 
-            bp_players[fixture
-                       ["stats"][9]["h"][h_i]["element"]] = n_players
             h_i += 1
             n_players -= 1
-        elif fixture["stats"][9]["h"][h_i]["value"] < fixture["stats"][9]["a"][a_i]["value"]:
 
-            bp_players[fixture
-                       ["stats"][9]["a"][a_i]["element"]] = n_players
+        elif fixture["stats"][9]["h"][h_i]["value"] < fixture["stats"][9]["a"][a_i]["value"]:
+            if fixture["stats"][9]["a"][a_i]["value"] == record["last_bps_score"]:
+                bp_players[fixture
+                           ["stats"][9]["a"][a_i]["element"]] = record["last_bonus"]
+            else:
+                bp_players[fixture
+                           ["stats"][9]["a"][a_i]["element"]] = n_players
+                record["last_bonus"] = n_players
+                record["last_bps_score"] = fixture["stats"][9]["a"][a_i]["value"]
 
             a_i += 1
             n_players -= 1
+
         elif fixture["stats"][9]["h"][h_i]["value"] == fixture["stats"][9]["a"][a_i]["value"]:
 
             bp_players[fixture

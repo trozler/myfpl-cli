@@ -393,6 +393,8 @@ def print_finished(finished, team_list, get_data_bootstrap, player_cache):
                     else:  # Can use official bonus, no need for computation.
                         point_scorers = findNames(finished[g]["stats"][k - 1]["h"],
                                                   finished[g]["stats"][k - 1]["a"], get_data_bootstrap, player_cache)
+                        h_points = len(point_scorers["home"])
+                        a_points = len(point_scorers["away"])
 
                 else:
                     point_scorers = findNames(finished[g]["stats"][k]["h"],
