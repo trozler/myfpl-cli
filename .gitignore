@@ -7,8 +7,6 @@ setupstuff/
 scripts/
 myfpl/__pycache__/
 test*
-config.json
-files.txt
 README_pip.md
 # Compiled python modules.
 *.pyc
