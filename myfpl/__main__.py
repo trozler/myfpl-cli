@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
-from site import USER_BASE
 import requests
 import getpass
 import argparse
 import sys
 import json
-from os.path import expanduser
+import os
+from site import USER_BASE
 
 from myfpl.live import liveRunner
 from myfpl.gameweek import gwRunner
@@ -15,7 +15,7 @@ from myfpl.fixtures import fixtureRunner
 
 team_id = None
 
-config_path = USER_BASE + "/share/myfpl/config.json"
+config_path = os.path.join(USER_BASE, "share", "myfpl", "config.json")
 
 
 def addCli():
