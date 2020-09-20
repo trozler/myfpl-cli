@@ -59,6 +59,8 @@ $ pip3 install myfpl
 $ myfpl <your args go here>
 ```
 
+Note: Do not use `sudo pip3 install myfpl`, as this will leads to issues with file permissions.\_
+
 If you want to clone using git instead of pip, here's how you do it.
 
 ```
