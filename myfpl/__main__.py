@@ -6,7 +6,7 @@ import argparse
 import sys
 import json
 import os
-from site import USER_BASE
+from os.path import expanduser
 
 from myfpl.live import liveRunner
 from myfpl.gameweek import gwRunner
@@ -15,7 +15,7 @@ from myfpl.fixtures import fixtureRunner
 
 team_id = None
 
-config_path = os.path.join(USER_BASE, "share", "myfpl", "config.json")
+config_path = os.path.join(expanduser("~"), ".config", "myfpl", "config.json")
 
 
 def addCli():
