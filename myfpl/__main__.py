@@ -24,11 +24,11 @@ def addCli():
         epilog="\n"
     )
     parser.add_argument("-g", "--gameweek", action="store_true", dest="gameweek",
-                        help="See how your gameweek is going by viewing your real time score, adjusted for preliminary bonus and substitutions.")
+                        help="See how your gameweek is going by viewing your real time score, adjusted for bonus and substitutions.")
     parser.add_argument("-t",
                         "--team", action="store_true", dest="team", help="Plan for future gameweeks by viewing transfers made, chips avialable, currently selected team and more.")
     parser.add_argument("-l",
-                        "--live", action="store_true", dest="live", help="Check out other people's teams and your league standings way before fpl updates. All standings and teams are based on real time scores, which are adjusted for preliminary bonus and substitutions. Also includes every players captaincy choice and transfer hits. It can be used on leagues of any size, inclduing the overall league.")
+                        "--live", action="store_true", dest="live", help="See other people's teams and your league standings before fpl updates. All standings and teams are based on real time scores, which are adjusted for bonus and substitutions. Output also includes every players captaincy choice and transfer hits. It can be used on leagues of any size, inclduing the overall league.")
 
     parser.add_argument("-c",
                         "--clear", action="store_true", dest="clear", help="Remove your email and team id stored in config.json.")

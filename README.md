@@ -10,19 +10,19 @@ Currently the core commands are:
 
 ![live](./promo/live.gif)
 
-- Check out other people's teams and your league standings way before fpl updates. All standings and teams are based on real time scores, which are adjusted for preliminary bonus and substitutions. Also includes every players captaincy choice and transfer hits. It can be used on leagues of any size, inclduing the overall league.
+- See other people's teams and your league standings way before fpl updates. All standings and teams are based on real time scores, which are adjusted for bonus and substitutions. Output also includes every players captaincy choice and transfer hits. It can be used on leagues of any size, inclduing the overall league.
 
 **Fixture**
 
 ![live](./promo/fix.gif)
 
-- Get real time scores from PL fixtures, including goals, assits, cards and bonus.
+- Get real time scores from PL fixtures, including goals, assists, cards and bonus.
 
 **Gameweek**
 
 ![live](./promo/gw.gif)
 
-- See how your gameweek is going by viewing your real time score, adjusted for preliminary bonus and substitutions.
+- See how your gameweek is going by viewing your real time score, adjusted for bonus and substitutions.
 
 **Team**
 
@@ -82,11 +82,11 @@ Example: https://fantasy.premierleague.com/entry/{team-id}/history
 ## Configuration options
 
 - -g, --gameweek
-  - See how your gameweek is going before fpl updates, by viewing your real time score, adjusted for preliminary bonus and substitutions.
+  - See how your gameweek is going before fpl updates, by viewing your real time score, adjusted for bonus and substitutions.
 - -t, --team
   - Plan for future gameweeks by viewing transfers made, chips avialable, currently selected team and more.
 - -l, --live
-  - Check out your league standings before fpl updates. All standings are based on real time scores, which are adjusted for preliminary bonus and substitutions.
+  - Check out your league standings before fpl updates. All standings are based on real time scores, which are adjusted for bonus and substitutions.
 - -f, --fixture
   - Get real time scores from PL fixtures.
 - -c, --clear
