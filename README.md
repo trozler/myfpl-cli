@@ -55,7 +55,7 @@ Python 3.8.1
 Using pip it is very easy, simply run the following:
 
 ```
-$ sudo pip3 install myfpl
+$ pip3 install myfpl
 $ myfpl <your args go here>
 ```
 

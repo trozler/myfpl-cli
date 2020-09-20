@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 
+from site import USER_BASE
 import requests
 import getpass
 import argparse
 import sys
 import json
+from os.path import expanduser
 
 from myfpl.live import liveRunner
 from myfpl.gameweek import gwRunner
@@ -12,6 +14,8 @@ from myfpl.team import teamRunner
 from myfpl.fixtures import fixtureRunner
 
 team_id = None
+
+config_path = USER_BASE + "/share/myfpl/config.json"
 
 
 def addCli():
@@ -50,7 +54,7 @@ def addCli():
 def handleTeamId():
     global team_id
     flag = False
-    with open('./myfpl/config.json', 'r+') as jf:
+    with open(config_path, 'r+') as jf:
         config_data = json.load(jf)
 
         if config_data["team_id"] == "":  # Enter your team id
@@ -83,7 +87,7 @@ def handleTeamId():
 def handleLogin(credentials):
     global team_id
     flag = False
-    with open('./myfpl/config.json', 'r+') as jf:
+    with open(config_path, 'r+') as jf:
         config_data = json.load(jf)
 
         if config_data["team_id"] == "":  # Enter your team id
@@ -130,7 +134,7 @@ def handleLogin(credentials):
 
 
 def clearConfig():
-    with open('./myfpl/config.json', 'w') as jf:
+    with open(config_path, 'w') as jf:
         config_data = {
             "email": "",
             "team_id": ""
@@ -183,7 +187,7 @@ def main():
 
         # testing
         # get_live_points = None
-        # with open('./teststuff/test3.json') as jf:
+        # with open(config_path) as jf:
         #     get_live_points = json.load(jf)
         # testing
 
@@ -263,7 +267,7 @@ def main():
 
         # testing
         # get_gw_fixture = None
-        # with open('./teststuff/test2.json') as jf:
+        # with open(config_path) as jf:
         #     get_gw_fixture = json.load(jf)
         # testing
 
