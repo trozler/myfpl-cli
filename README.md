@@ -59,11 +59,12 @@ $ pip3 install myfpl
 $ myfpl <your args go here>
 ```
 
-Note: 
-* Do not use `sudo pip3 install myfpl`, as this will leads to issues with file permissions for `config.json`. And requires you to run `sudo myfpl` for every command. 
+Note:
 
+- Do not use `sudo pip3 install myfpl`, as this will leads to issues with file permissions for `config.json`. And requires you to run `sudo myfpl` for every command.
 
 If you want to clone the project do the following.
+
 ```
 $ cd ~
 $ git clone https://github.com/trozler/myfpl.git
