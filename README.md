@@ -97,3 +97,9 @@ Example: https://fantasy.premierleague.com/entry/{team-id}/history
 [1]: https://img.shields.io/badge/-Shell-89e051
 [2]: https://img.shields.io/badge/python-3.3+-blue
 [3]: https://img.shields.io/badge/license-MIT-orange
+
+### Contribution
+
+If you spot bugs or have features that you'd really like to see in myfpl, please check out the [contributing page](https://github.com/trozler/myfpl/.github/CONTRIBUTION.md).
+
+For suggestions about new features or bugs please head over to the [issue tracker](https://github.com/trozler/myfpl/issues) or if you wan't open a [pull request](https://github.com/trozler/myfpl/pulls).
