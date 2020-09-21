@@ -15,7 +15,8 @@ from myfpl.fixtures import fixtureRunner
 
 team_id = None
 
-config_path = pkg_resources.resource_filename("myfpl", ".config/config.json")
+config_path = pkg_resources.resource_filename(
+    "myfpl", os.path.join(".config", "config.json"))
 
 
 def addCli():
