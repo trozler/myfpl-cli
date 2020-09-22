@@ -100,6 +100,5 @@ Example: https://fantasy.premierleague.com/entry/{team-id}/history
 
 ### Contribution
 
-If you spot bugs or have features that you'd really like to see in myfpl, please check out the [contributing page](https://github.com/trozler/myfpl/.github/CONTRIBUTION.md).
+If you spot bugs or have features that you'd really like to see in myfpl, please check out the [contributing page](https://github.com/trozler/myfpl/blob/master/.github/CONTRIBUTING.md).
 
-For suggestions about new features or bugs please head over to the [issue tracker](https://github.com/trozler/myfpl/issues) or if you wan't open a [pull request](https://github.com/trozler/myfpl/pulls).
