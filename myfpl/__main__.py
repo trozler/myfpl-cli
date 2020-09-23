@@ -27,7 +27,7 @@ def addCli():
     parser.add_argument("-g", "--gameweek", action="store_true", dest="gameweek",
                         help="See how your gameweek is going by viewing your real time score, adjusted for bonus and substitutions.")
     parser.add_argument("-t",
-                        "--team", action="store_true", dest="team", help="Plan for future gameweeks by viewing transfers made, chips avialable, currently selected team and more.")
+                        "--team", action="store_true", dest="team", help="Plan for future gameweeks by viewing transfers made, chips avialable, currently selected team and more. Fpl password and email are required for this command, as your team line up is private. Your email and team id will be cached locally for future use, but never your password. You can clear cache with myfpl -c.")
     parser.add_argument("-l",
                         "--live", action="store_true", dest="live", help="See other people's teams and your league standings before fpl updates. All standings and teams are based on real time scores, which are adjusted for bonus and substitutions. Output also includes every players captaincy choice and transfer hits. It can be used on leagues of any size, inclduing the overall league.")
 
@@ -40,14 +40,14 @@ def addCli():
     if len(sys.argv) <= 1:
         parser.print_help()
         print()
-        sys.exit(1)
+        sys.exit(0)
 
     try:
         args = parser.parse_args()
     except:
         parser.print_help()
         print()
-        sys.exit(1)
+        sys.exit(0)
 
     return args
 
@@ -63,8 +63,8 @@ def handleTeamId():
 
             while True:
                 print("Enter team ID: ", end='')
-                temp = input()
                 try:
+                    temp = input()
                     temp = int(temp)
                     if temp <= 0:
                         print("please enter a valid team id.")
@@ -72,6 +72,9 @@ def handleTeamId():
                     team_id = temp
                     config_data["team_id"] = team_id
                     break
+                except KeyboardInterrupt:
+                    print()
+                    sys.exit(0)
                 except:
                     print("please enter a valid team id.")
 
@@ -92,12 +95,13 @@ def handleLogin(credentials):
         config_data = json.load(jf)
 
         if config_data["team_id"] == "":  # Enter your team id
+            print("Fpl password and email are required for this command, as your team line up is private. Your email and team id will be cached locally for future use, but never your password. You can clear cache with myfpl -c.\n")
             flag = True
 
             while True:
                 print("Enter team ID: ", end='')
-                temp = input()
                 try:
+                    temp = input()
                     temp = int(temp)
                     if temp <= 0:
                         print("please enter a valid team id.")
@@ -105,6 +109,9 @@ def handleLogin(credentials):
                     team_id = temp
                     config_data["team_id"] = team_id
                     break
+                except KeyboardInterrupt:
+                    print()
+                    sys.exit(0)
                 except:
                     print("please enter a valid team id.")
 
@@ -171,12 +178,12 @@ def main():
         if len(get_data_entry) == 1:
             print("Bad team id, please try again.")
             clearConfig()
-            sys.exit(1)
+            sys.exit(0)
 
         if get_data_entry["current_event"] == None:
             print(
                 "Fpl api/entry is not available currently, please try again when season returns.")
-            sys.exit(1)
+            sys.exit(0)
 
         # gw_Team API will always work no login needed.
         gw_team_api = 'https://fantasy.premierleague.com/api/entry/%s/event/%s/picks/' % (
@@ -205,12 +212,12 @@ def main():
         if len(get_data_entry) == 1:
             print("Bad team id, please try again.")
             clearConfig()
-            sys.exit(1)
+            sys.exit(0)
 
         if get_data_entry["current_event"] == None:
             print(
                 "Premier League not in season, please come when season returns.")
-            sys.exit(1)
+            sys.exit(0)
 
         live_points_url = "https://fantasy.premierleague.com/api/event/%s/live/#/" % get_data_entry["current_event"]
         get_live_points = session.get(live_points_url).json()
@@ -231,7 +238,7 @@ def main():
         # Handle errors
         if (curr_gw) == None:
             print("Premier League not in season, please come when season returns.")
-            sys.exit(1)
+            sys.exit(0)
 
         handleLogin(credentials)
 
@@ -247,7 +254,7 @@ def main():
         if len(get_data_team) == 1:  # If bad passowrd, emial or team_id. Always 200 response,
             print("Wrong login information, please try again.")
             clearConfig()
-            sys.exit(1)
+            sys.exit(0)
 
         teamRunner(session, team_id, get_data_team,
                    get_data_bootstrap, curr_gw)
@@ -261,7 +268,7 @@ def main():
         # Handle errors
         if (curr_gw) == None:
             print("Premier League not in season, please come back when season returns.")
-            sys.exit(1)
+            sys.exit(0)
 
         fixture_url = "https://fantasy.premierleague.com/api/fixtures/?event=%s#/" % curr_gw
         get_gw_fixture = session.get(fixture_url).json()

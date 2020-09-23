@@ -29,6 +29,7 @@ Currently the core commands are:
 ![live](./promo/team.gif)
 
 - Team command is intended for users who want to plan for future gameweeks. It will correctly display the team you have selected for next gameweek, transfers made and chips available.
+- You will be prompted for your team id, fpl email and password, the first time you use this command, as your current team line up is private. Your email and team id will be cached locally, but never your password. The next time around you will only be promtped for your password. You can always clear the cache by running `myfpl -c`.
 
 #### Note
 
@@ -84,7 +85,7 @@ Example: https://fantasy.premierleague.com/entry/{team-id}/history
 - -g, --gameweek
   - See how your gameweek is going before fpl updates, by viewing your real time score, adjusted for bonus and substitutions.
 - -t, --team
-  - Plan for future gameweeks by viewing transfers made, chips avialable, currently selected team and more.
+  - Plan for future gameweeks by viewing transfers made, chips avialable, currently selected team and more. Fpl password and email are required for this command, as your team line up is private. Your email and team id will be cached locally for future use, but never your password. You can clear cache with -c command.
 - -l, --live
   - Check out your league standings before fpl updates. All standings are based on real time scores, which are adjusted for bonus and substitutions.
 - -f, --fixture
@@ -94,11 +95,10 @@ Example: https://fantasy.premierleague.com/entry/{team-id}/history
 - -h, --help
   - Show help for all commands.
 
-[1]: https://img.shields.io/badge/-Shell-89e051
-[2]: https://img.shields.io/badge/python-3.3+-blue
-[3]: https://img.shields.io/badge/license-MIT-orange
-
 ### Contribution
 
 If you spot bugs or have features that you'd really like to see in myfpl, please check out the [contributing page](https://github.com/trozler/myfpl/blob/master/.github/CONTRIBUTING.md).
 
+[1]: https://img.shields.io/badge/-Shell-89e051
+[2]: https://img.shields.io/badge/python-3.3+-blue
+[3]: https://img.shields.io/badge/license-MIT-orange

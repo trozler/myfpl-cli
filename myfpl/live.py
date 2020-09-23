@@ -2,6 +2,7 @@
 
 from collections import OrderedDict
 from myfpl.gameweek import printGwTeam
+import sys
 
 
 # Globals
@@ -58,6 +59,11 @@ def liveRunner(session, get_data_entry, get_data_bootstrap, get_live_points, get
             else:
                 process_league(ID, session, get_data_entry,
                                get_data_bootstrap, get_live_points)
+
+        except KeyboardInterrupt:
+            print()
+            sys.exit(0)
+
         except:
             continue
 
@@ -140,6 +146,10 @@ def process_league(ID, session, get_data_entry, get_data_bootstrap, get_live_poi
                             league_map[ID][1], page_num)
                         get_data_league = session.get(league_api).json()
 
+                except KeyboardInterrupt:
+                    print()
+                    sys.exit(0)
+
                 except:
                     page_num += 1
                     limit_page += 4
@@ -221,6 +231,10 @@ def process_league(ID, session, get_data_entry, get_data_bootstrap, get_live_poi
 
                 print("Gameweek rank:   %-7s\tOverall rank:   %-7s\n" %
                       (get_gw_team["entry_history"]["rank"], get_gw_team["entry_history"]["overall_rank"]))
+
+        except KeyboardInterrupt:
+            print()
+            sys.exit(0)
 
         except:
             break
