@@ -27,7 +27,7 @@ def addCli():
     parser.add_argument("-g", "--gameweek", action="store_true", dest="gameweek",
                         help="See how your gameweek is going by viewing your real time score, adjusted for bonus and substitutions.")
     parser.add_argument("-t",
-                        "--team", action="store_true", dest="team", help="Plan for future gameweeks by viewing transfers made, chips avialable, currently selected team and more. Fpl password and email are required for this command, as your team line up is private. Your email and team id will be cached locally for future use, but never your password. You can clear cache with myfpl -c.")
+                        "--team", action="store_true", dest="team", help="Plan for future gameweeks by viewing transfers made, chips avialable, currently selected team and more. Since your team line-up is private, your Fpl password and email are required. Your email and team id will be cached locally for future use, but never your password. You can clear cache with myfpl -c.")
     parser.add_argument("-l",
                         "--live", action="store_true", dest="live", help="See other people's teams and your league standings before fpl updates. All standings and teams are based on real time scores, which are adjusted for bonus and substitutions. Output also includes every players captaincy choice and transfer hits. It can be used on leagues of any size, inclduing the overall league.")
 
@@ -95,7 +95,7 @@ def handleLogin(credentials):
         config_data = json.load(jf)
 
         if config_data["team_id"] == "":  # Enter your team id
-            print("Fpl password and email are required for this command, as your team line up is private. Your email and team id will be cached locally for future use, but never your password. You can clear cache with myfpl -c.\n")
+            print("Since your team line-up is private, your Fpl password and email are required. Your email and team id will be cached locally for future use, but never your password. You can clear the cache with myfpl -c.\n")
             flag = True
 
             while True:

@@ -111,23 +111,29 @@ def process_league(ID, session, get_data_entry, get_data_bootstrap, get_live_poi
 
             for pl in player_list["starting"]:
                 gw_points = live_points_cache[pl["ID"]
-                                              ]['stats']['total_points']
+                                              ]['stats']['total_points'] #Get actual points.
+                gw_points += pl["tot_gw_points"] #Add bonus
                 if pl["multiplier"] == 2:
                     gw_points *= 2
                     captain_id_name[0], captain_id_name[1], captain_id_name[2] = gw_points, pl["name"], False
                 elif pl["multiplier"] == 3:
                     gw_points *= 3
                     captain_id_name[0], captain_id_name[1], captain_id_name[2] = gw_points, pl["name"], True
-
-                pl["tot_gw_points"] += gw_points
+                
+                pl["tot_gw_points"] = gw_points
                 speed_gw_points += gw_points
+            
+            for pl in player_list["bench"]:
+                gw_points = live_points_cache[pl["ID"]]['stats']['total_points']
+                gw_points += pl["tot_gw_points"]  # Include bonus.
+                pl["tot_gw_points"] = gw_points
 
             # Have Team name + person name of as key. Value is a tuple:
-            # (gw-1 points + gw points - hits, gw points - hits, previous rank, hits, gw team)
+            # (gw-1 points + gw points - hits, gw points - hits, previous rank, hits, gw team, player_list)
             user_map[user_id] = (speed_gw_points + gw_old_points - get_gw_team["entry_history"]["event_transfers_cost"], speed_gw_points - get_gw_team["entry_history"]["event_transfers_cost"],
                                  get_data_league["standings"]["results"][i]["rank"],
                                  -get_gw_team["entry_history"]["event_transfers_cost"],
-                                 captain_id_name, get_gw_team)
+                                 captain_id_name, get_gw_team, player_list)
 
         # Only print first 200 entries. Then ask if want to keep going
         if page_num == limit_page or len(get_data_league['standings']['results']) == 0:
@@ -191,8 +197,7 @@ def process_league(ID, session, get_data_entry, get_data_bootstrap, get_live_poi
         try:
             ID = int(input())
             if 1 <= ID <= len(user_list):
-                player_list = {"starting": [],
-                               "bench": [], "formation": [0, 0, 0, 0]}
+                player_list = user_list[ID - 1][1][6]
                 get_gw_team = user_list[ID - 1][1][5]
                 speed_gw_points = 0
                 print("\n" + user_list[ID - 1][0])
@@ -203,25 +208,17 @@ def process_league(ID, session, get_data_entry, get_data_bootstrap, get_live_poi
                 print('Name', '{0:>35}'.format('(GW)'), '{0: >9}'.format('Price'), '{0: >6}'.format(
                     '(GW)'), '{0: >8}'.format('NextGW'), '{0: >7}'.format("News\n"))
 
-                printGwTeam(session, get_gw_team,
-                            get_data_bootstrap, get_data_entry, get_live_points, player_list, live_points_cache, player_cache)
+                # printGwTeam(session, get_gw_team,
+                #             get_data_bootstrap, get_data_entry, get_live_points, player_list, live_points_cache, player_cache)
 
                 for pl in player_list["starting"]:
-                    gw_points = live_points_cache[pl["ID"]
-                                                  ]['stats']['total_points']
-                    if pl["multiplier"] == 2:
-                        gw_points *= 2
-                    elif pl["multiplier"] == 3:
-                        gw_points *= 3
-                    pl["tot_gw_points"] += gw_points
+                    gw_points = pl["tot_gw_points"]
+                        
                     speed_gw_points += gw_points
                     print("%-25s %-9s %-8d %-7.1f %-6.1f %-8d %s" %
                           (pl["name"], pl["player_status"], pl["tot_gw_points"], pl["price"], pl["price_change"], pl["next_round"], pl["news"]))
 
                 for pl in player_list["bench"]:
-                    gw_points = live_points_cache[pl["ID"]
-                                                  ]['stats']['total_points']
-                    pl["tot_gw_points"] += gw_points
                     print("%-25s %-9s %-8d %-7.1f %-6.1f %-8d %s" %
                           (pl["name"], pl["player_status"], pl["tot_gw_points"], pl["price"], pl["price_change"], pl["next_round"], pl["news"]))
 

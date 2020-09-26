@@ -21,27 +21,32 @@ def gwRunner(session, get_gw_team, get_data_bootstrap, get_data_entry, get_live_
 
     for pl in player_list["starting"]:
         gw_points = live_points_cache[pl["ID"]]['stats']['total_points']
+        gw_points += pl["tot_gw_points"]  # Include bonus.
         if pl["multiplier"] == 2:
             gw_points *= 2
         elif pl["multiplier"] == 3:
             gw_points *= 3
-        pl["tot_gw_points"] += gw_points
+        
+        pl["tot_gw_points"] = gw_points
         speed_gw_points += gw_points
         print("%-25s %-9s %-8d %-7.1f %-6.1f %-8d %s" %
               (pl["name"], pl["player_status"], pl["tot_gw_points"], pl["price"], pl["price_change"], pl["next_round"], pl["news"]))
 
     for pl in player_list["bench"]:
         gw_points = live_points_cache[pl["ID"]]['stats']['total_points']
-        pl["tot_gw_points"] += gw_points
+        gw_points += pl["tot_gw_points"]  # Include bonus.
+        pl["tot_gw_points"] = gw_points
         print("%-25s %-9s %-8d %-7.1f %-6.1f %-8d %s" %
               (pl["name"], pl["player_status"], pl["tot_gw_points"], pl["price"], pl["price_change"], pl["next_round"], pl["news"]))
 
     print("\n\nGameweek points: %d (%d)       \tOverall points: %-7d" %
           (speed_gw_points, get_gw_team["entry_history"]["event_transfers_cost"],
-           get_gw_team["entry_history"]["total_points"]))
+           get_gw_team["entry_history"]["total_points"] + speed_gw_points))
 
     print("Gameweek rank:   %-7s\tOverall rank:   %-7s\n" %
           (get_gw_team["entry_history"]["rank"], get_gw_team["entry_history"]["overall_rank"]))
+
+    print("\nOfficial league standings as per fpl; use myfpl -l for real time standings.\n")
 
     print("\nH2H Leagues:\n")
     print(sp*40 + "Prev" + sp*7 + "Curr" + sp*7 + "Rank" + sp*7 + "Leader")
@@ -129,6 +134,10 @@ def printGwTeam(session, get_gw_team, get_data_bootstrap, get_data_entry, get_li
             temp["team_position"] = team_position
             temp["multiplier"] = multiplier
 
+            team = temp["team"]
+            if not team in team_list:
+                team_list[team] = ID
+
             if player_status == "(Bench)":
                 player_list["bench"].append(temp)
             else:
@@ -147,10 +156,8 @@ def printGwTeam(session, get_gw_team, get_data_bootstrap, get_data_entry, get_li
                     news = get_data_bootstrap['elements'][i]['news']
 
                     team = get_data_bootstrap['elements'][i]["team"]
-                    if team in team_list:
-                        team_list[team].append(ID)
-                    else:
-                        team_list[team] = [ID]
+                    if not team in team_list:
+                        team_list[team] = ID
 
                     if player_status == "(Bench)":
                         player_list["bench"].append({
@@ -233,7 +240,7 @@ def printGwTeam(session, get_gw_team, get_data_bootstrap, get_data_entry, get_li
                     live_points_cache[ID] = get_live_points['elements'][i]
                     break
 
-    if not get_data_bootstrap["events"][0]["finished"]:
+    if not get_data_bootstrap["events"][get_data_entry["current_event"]]["finished"]:
         getFixtuerData(session, get_data_bootstrap, get_data_entry,
                        player_list, team_list, get_live_points, live_points_cache)
 

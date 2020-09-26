@@ -85,7 +85,7 @@ Example: https://fantasy.premierleague.com/entry/{team-id}/history
 - -g, --gameweek
   - See how your gameweek is going before fpl updates, by viewing your real time score, adjusted for bonus and substitutions.
 - -t, --team
-  - Plan for future gameweeks by viewing transfers made, chips avialable, currently selected team and more. Fpl password and email are required for this command, as your team line up is private. Your email and team id will be cached locally for future use, but never your password. You can clear cache with -c command.
+  - Plan for future gameweeks by viewing transfers made, chips avialable, currently selected team and more. Since your team line-up is private, your Fpl password and email are required. Your email and team id will be cached locally for future use, but never your password. You can clear the cache with -c command.
 - -l, --live
   - Check out your league standings before fpl updates. All standings are based on real time scores, which are adjusted for bonus and substitutions.
 - -f, --fixture
