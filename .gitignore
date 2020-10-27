@@ -8,6 +8,8 @@ scripts/
 myfpl/__pycache__/
 test*
 README_pip.md
+setup.py
+requirements.txt
 # Compiled python modules.
 *.pyc
 
@@ -18,3 +20,4 @@ README_pip.md
 # Python egg metadata, regenerated from source files by setuptools.
 /*.egg-info
 /*.egg
+
