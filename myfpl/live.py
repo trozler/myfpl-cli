@@ -111,20 +111,21 @@ def process_league(ID, session, get_data_entry, get_data_bootstrap, get_live_poi
 
             for pl in player_list["starting"]:
                 gw_points = live_points_cache[pl["ID"]
-                                              ]['stats']['total_points'] #Get actual points.
-                gw_points += pl["tot_gw_points"] #Add bonus
+                                              ]['stats']['total_points']  # Get actual points.
+                gw_points += pl["tot_gw_points"]  # Add bonus
                 if pl["multiplier"] == 2:
                     gw_points *= 2
                     captain_id_name[0], captain_id_name[1], captain_id_name[2] = gw_points, pl["name"], False
                 elif pl["multiplier"] == 3:
                     gw_points *= 3
                     captain_id_name[0], captain_id_name[1], captain_id_name[2] = gw_points, pl["name"], True
-                
+
                 pl["tot_gw_points"] = gw_points
                 speed_gw_points += gw_points
-            
+
             for pl in player_list["bench"]:
-                gw_points = live_points_cache[pl["ID"]]['stats']['total_points']
+                gw_points = live_points_cache[pl["ID"]
+                                              ]['stats']['total_points']
                 gw_points += pl["tot_gw_points"]  # Include bonus.
                 pl["tot_gw_points"] = gw_points
 
@@ -200,6 +201,7 @@ def process_league(ID, session, get_data_entry, get_data_bootstrap, get_live_poi
                 player_list = user_list[ID - 1][1][6]
                 get_gw_team = user_list[ID - 1][1][5]
                 speed_gw_points = 0
+                tot_points_season = user_list[ID - 1][1][0]
                 print("\n" + user_list[ID - 1][0])
                 print("Gameweek:", get_data_entry["current_event"])
                 print()
@@ -213,7 +215,7 @@ def process_league(ID, session, get_data_entry, get_data_bootstrap, get_live_poi
 
                 for pl in player_list["starting"]:
                     gw_points = pl["tot_gw_points"]
-                        
+
                     speed_gw_points += gw_points
                     print("%-25s %-9s %-8d %-7.1f %-6.1f %-8d %s" %
                           (pl["name"], pl["player_status"], pl["tot_gw_points"], pl["price"], pl["price_change"], pl["next_round"], pl["news"]))
@@ -223,8 +225,7 @@ def process_league(ID, session, get_data_entry, get_data_bootstrap, get_live_poi
                           (pl["name"], pl["player_status"], pl["tot_gw_points"], pl["price"], pl["price_change"], pl["next_round"], pl["news"]))
 
                 print("\n\nGameweek points: %d (%d)       \tOverall points: %-7d" %
-                      (speed_gw_points, get_gw_team["entry_history"]["event_transfers_cost"],
-                       get_gw_team["entry_history"]["total_points"]))
+                      (speed_gw_points, get_gw_team["entry_history"]["event_transfers_cost"], tot_points_season))
 
                 print("Gameweek rank:   %-7s\tOverall rank:   %-7s\n" %
                       (get_gw_team["entry_history"]["rank"], get_gw_team["entry_history"]["overall_rank"]))

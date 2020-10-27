@@ -193,6 +193,13 @@ def main():
         live_points_url = "https://fantasy.premierleague.com/api/event/%s/live/#/" % get_data_entry["current_event"]
         get_live_points = session.get(live_points_url).json()
 
+        gw_old_points = 0
+        if get_data_entry["current_event"] > 1:
+            gw_team_old_api = 'https://fantasy.premierleague.com/api/entry/%s/event/%s/picks/' % (
+                team_id, get_data_entry["current_event"] - 1)
+            get_gw_old_team = session.get(gw_team_old_api).json()
+            gw_old_points = get_gw_old_team["entry_history"]["total_points"]
+
         # testing
         # get_live_points = None
         # with open(config_path) as jf:
@@ -200,7 +207,7 @@ def main():
         # testing
 
         gwRunner(session, get_gw_team, get_data_bootstrap,
-                 get_data_entry, get_live_points)
+                 get_data_entry, get_live_points, gw_old_points)
 
     # Should not ask for password.
     elif args.live:

@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 
-def gwRunner(session, get_gw_team, get_data_bootstrap, get_data_entry, get_live_points):
+def gwRunner(session, get_gw_team, get_data_bootstrap, get_data_entry, get_live_points, gw_old_points):
 
     sp = ' '
     player_list = {"starting": [], "bench": [], "formation": [0, 0, 0, 0]}
     live_points_cache = {}
     player_cache = {}
     speed_gw_points = 0
-    print()
 
+    print()
     print("Gameweek:", get_data_entry["current_event"])
     print()
     print('{0: >42}'.format("Points"), '{0:>13}'.format(
@@ -26,7 +26,7 @@ def gwRunner(session, get_gw_team, get_data_bootstrap, get_data_entry, get_live_
             gw_points *= 2
         elif pl["multiplier"] == 3:
             gw_points *= 3
-        
+
         pl["tot_gw_points"] = gw_points
         speed_gw_points += gw_points
         print("%-25s %-9s %-8d %-7.1f %-6.1f %-8d %s" %
@@ -40,8 +40,7 @@ def gwRunner(session, get_gw_team, get_data_bootstrap, get_data_entry, get_live_
               (pl["name"], pl["player_status"], pl["tot_gw_points"], pl["price"], pl["price_change"], pl["next_round"], pl["news"]))
 
     print("\n\nGameweek points: %d (%d)       \tOverall points: %-7d" %
-          (speed_gw_points, get_gw_team["entry_history"]["event_transfers_cost"],
-           get_gw_team["entry_history"]["total_points"] + speed_gw_points))
+          (speed_gw_points, get_gw_team["entry_history"]["event_transfers_cost"], speed_gw_points + gw_old_points - get_gw_team["entry_history"]["event_transfers_cost"]))
 
     print("Gameweek rank:   %-7s\tOverall rank:   %-7s\n" %
           (get_gw_team["entry_history"]["rank"], get_gw_team["entry_history"]["overall_rank"]))
