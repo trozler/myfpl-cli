@@ -77,7 +77,7 @@ def process_league(ID, session, get_data_entry, get_data_bootstrap, get_live_poi
     page_num = 1
     limit_page = 4
 
-    league_api = 'https://fantasy.premierleague.com/api/leagues-classic/%s/standings/?page_new_entries=1&page_standings=%s&phase=1' % (
+    league_api = 'https://fantasy.premierleague.com/api/leagues-classic/%s/standings/?page_standings=%s' % (
         league_map[ID][1], page_num)
     get_data_league = session.get(league_api).json()
     gameweek = get_data_entry["current_event"]
@@ -149,7 +149,7 @@ def process_league(ID, session, get_data_entry, get_data_bootstrap, get_live_poi
                     else:
                         page_num += 1
                         limit_page += 4
-                        league_api = 'https://fantasy.premierleague.com/api/leagues-classic/%s/standings/?page_new_entries=1&page_standings=%s&phase=1' % (
+                        league_api = 'https://fantasy.premierleague.com/api/leagues-classic/%s/standings/?page_standings=%s' % (
                             league_map[ID][1], page_num)
                         get_data_league = session.get(league_api).json()
 
@@ -160,7 +160,7 @@ def process_league(ID, session, get_data_entry, get_data_bootstrap, get_live_poi
                 except:
                     page_num += 1
                     limit_page += 4
-                    league_api = 'https://fantasy.premierleague.com/api/leagues-classic/%s/standings/?page_new_entries=1&page_standings=%s&phase=1' % (
+                    league_api = 'https://fantasy.premierleague.com/api/leagues-classic/%s/standings/?page_standings=%s' % (
                         league_map[ID][1], page_num)
                     get_data_league = session.get(league_api).json()
 
@@ -169,7 +169,7 @@ def process_league(ID, session, get_data_entry, get_data_bootstrap, get_live_poi
 
         else:
             page_num += 1
-            league_api = 'https://fantasy.premierleague.com/api/leagues-classic/%s/standings/?page_new_entries=1&page_standings=%s&phase=1' % (
+            league_api = 'https://fantasy.premierleague.com/api/leagues-classic/%s/standings/?page_standings=%s' % (
                 league_map[ID][1], page_num)
             get_data_league = session.get(league_api).json()
 
