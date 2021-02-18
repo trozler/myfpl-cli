@@ -1,8 +1,21 @@
-## myfpl - A command line interface for Fantasy Premier League
+## myfpl cli - A command line interface for Fantasy Premier League
 
 ![Python][2]![Shell][1]![License][3]
 
 A command line interface that allows users to retrieve information about their fpl teams, leagues and fixtures in single commands.
+
+---
+**Update: [myfpl browser extension](https://myfpl.net/)**
+
+I have created a browser extension for fantasy.premierleague.com also called myfpl, that provides a host of UI updates and also makes fpl real time.
+
+myfpl calculates league standings and points in real time, by computing real time bonus and making auto-subs, during the actual gameweek.
+
+The extension also lets you plan for future gameweeks natively and gives a useful browser popup to keep track of games and h2h matches.
+
+You can find out more about the extension at https://myfpl.net/.
+
+---
 
 Currently the core commands are:
 
